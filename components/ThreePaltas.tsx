@@ -34,7 +34,7 @@ export function ThreePaltas() {
   }, []);
 
   return (
-    <section ref={root} className="relative flex min-h-[760px] flex-col items-center justify-center gap-10 overflow-hidden bg-muted px-8 py-24">
+    <section ref={root} className="relative flex min-h-[760px] flex-col items-center justify-center gap-10 overflow-hidden bg-background px-8 py-24">
       {hojas.map((h) => (
         <div key={h.src} data-parallax={h.depth} aria-hidden="true" className={`pointer-events-none absolute z-0 ${h.cls}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}

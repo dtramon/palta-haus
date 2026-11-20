@@ -62,7 +62,7 @@ export function Benefits() {
   }, []);
 
   return (
-    <section ref={root} id="beneficios" className="scroll-mt-16 relative overflow-hidden bg-muted pt-20 pb-16 md:pt-28 md:pb-24">
+    <section ref={root} id="beneficios" className="scroll-mt-16 relative overflow-hidden bg-background pt-20 pb-16 md:pt-28 md:pb-24">
       <svg viewBox="0 0 1360 1000" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-0 hidden size-full md:block">
         <path d="M-20 140 C 300 40, 560 260, 700 420 S 1120 760, 1400 640" fill="none" stroke="#fff" strokeWidth="10" strokeLinecap="round" />
       </svg>
