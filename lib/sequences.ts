@@ -5,3 +5,6 @@ export const sequences = {
   apertura: { dir: "/frames/apertura", dirHd: "/frames/apertura-hd", count: 141 }, // campo → zoom al árbol → cae la palta (escenas 1–3). 1280×720 webp; dirHd = 1916×1080 para pantallas ≥1700 px (clips de Kling a 12 fps)
   cajon: { dir: "/frames/cajon", count: 0 }, // la palta cae al cajón (escena 7)
 };
+
+// Giro completo de la palta protagonista (escena 5, móvil). 73 frames webp con transparencia, 520×720, recortados de un clip de Kling de 6 s sobre fondo verde.
+export const giroPalta = { dir: "/frames/palta-giro", count: 73, width: 520, height: 720 };

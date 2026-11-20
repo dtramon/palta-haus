@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
 import { Card } from "./ui/card";
 import { beneficios } from "@/lib/content";
+import { giroPalta } from "@/lib/sequences";
 
 type Item = { title: string; dato: string; texto: string };
 
@@ -69,15 +70,53 @@ export function Benefits() {
         0,
       );
       // Entrada de la palta: sube grande e inclinada y se asienta en el centro.
-      tl.fromTo(palta, { y: () => H() * 0.28, scale: 1.3, rotation: -18 }, { y: 0, scale: 1, rotation: 0, duration: 0.7, ease: "power2.out" }, 0);
-      // Cada vez que una card pasa por debajo, la palta se ladea y gira un poco sobre su eje.
-      cards.forEach((_, i) => {
-        const k = i % 2 ? -1 : 1;
-        tl.to(palta, { keyframes: [{ rotation: k * 12, rotationY: k * 32, scale: 1.04, duration: 0.4 }, { rotation: 0, rotationY: 0, scale: 1, duration: 0.4 }], ease: "sine.inOut" }, STEP * i + 0.75);
-      });
+      tl.fromTo(palta, { y: () => H() * 0.28, scale: 1.3, rotation: -10 }, { y: 0, scale: 1, rotation: 0, duration: 0.7, ease: "power2.out" }, 0);
+      // Giro completo: los frames avanzan con el scroll durante toda la escena (una vuelta mientras pasan las cards).
+      const canvas = palta.querySelector<HTMLCanvasElement>("canvas")!;
+      const img = palta.querySelector<HTMLImageElement>("img")!;
+      const c2d = canvas.getContext("2d")!;
+      const frames: HTMLImageElement[] = [];
+      const state = { frame: 0 };
+      let shown = false;
+      const fit = () => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(palta.offsetWidth * dpr);
+        canvas.height = Math.round(palta.offsetHeight * dpr);
+        draw();
+      };
+      const draw = () => {
+        let i = Math.round(state.frame);
+        while (i > 0 && !(frames[i]?.complete && frames[i].naturalWidth)) i--; // si aún no cargó ese frame, usa el anterior
+        const f = frames[i];
+        if (!f || !f.complete || !f.naturalWidth) return;
+        c2d.clearRect(0, 0, canvas.width, canvas.height);
+        c2d.drawImage(f, 0, 0, canvas.width, canvas.height);
+        if (!shown) {
+          shown = true;
+          canvas.style.opacity = "1";
+          img.style.opacity = "0";
+        }
+      };
+      const load = () => {
+        if (frames.length) return;
+        for (let n = 0; n < giroPalta.count; n++) {
+          const im = new Image();
+          im.decoding = "async";
+          im.onload = n === 0 ? draw : null;
+          im.src = `${giroPalta.dir}/${String(n + 1).padStart(4, "0")}.webp`;
+          frames.push(im);
+        }
+      };
+      tl.to(state, { frame: giroPalta.count - 1, duration: 3.7, ease: "none", onUpdate: draw }, 0.7);
+      const loader = ScrollTrigger.create({ trigger: stage, start: "top bottom+=1500", once: true, onEnter: load });
+      ScrollTrigger.addEventListener("refresh", fit);
       gsap.set(palta, { transformPerspective: 900 });
       requestAnimationFrame(() => ScrollTrigger.refresh());
       return () => {
+        loader.kill();
+        ScrollTrigger.removeEventListener("refresh", fit);
+        canvas.style.opacity = "0";
+        img.style.opacity = "1";
         delete sec.dataset.stage;
       };
     });
@@ -94,15 +133,15 @@ export function Benefits() {
         <div className="stage-col flex flex-col gap-4 md:gap-6">{beneficios.izquierda.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
 
         <div className="stage-palta order-first flex items-center justify-center py-2 md:order-none md:py-10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <div
             data-protagonista
-            src="/paltas/palta-1.webp"
-            width={770}
-            height={1093}
-            alt="Palta Hass madura"
-            className="h-auto w-[min(240px,62vw)] select-none drop-shadow-[0_28px_28px_rgba(22,51,30,.22)] md:w-[min(340px,70vw)] md:motion-reduce:rotate-[12deg]"
-          />
+            style={{ aspectRatio: `${giroPalta.width} / ${giroPalta.height}` }}
+            className="relative w-[min(240px,62vw)] select-none drop-shadow-[0_28px_28px_rgba(22,51,30,.22)] md:w-[min(340px,70vw)] md:motion-reduce:rotate-[12deg]"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" className="absolute inset-0 size-full object-contain" />
+            <canvas aria-hidden="true" className="pointer-events-none absolute inset-0 size-full opacity-0" />
+          </div>
         </div>
 
         <div className="stage-col flex flex-col gap-4 md:gap-6 md:pt-24">{beneficios.derecha.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
