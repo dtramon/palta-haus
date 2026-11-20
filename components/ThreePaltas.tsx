@@ -46,13 +46,13 @@ export function ThreePaltas() {
         Paltas en su punto.<br /><span className="text-foreground">¿Cuántas necesitas?</span>
       </h2>
 
-      <div className="relative z-10 flex flex-wrap items-end justify-center gap-[clamp(6px,2vw,48px)]">
+      <div className="relative z-10 flex w-[calc(100%+4rem)] items-end justify-center md:w-auto md:flex-wrap md:gap-[clamp(6px,2vw,48px)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`h-auto w-[clamp(84px,16vw,320px)] -rotate-[9deg] ${shadow}`} />
+        <img data-float src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`h-auto relative z-0 -mr-[7vw] w-[32vw] -rotate-[9deg] md:m-0 md:w-[clamp(84px,16vw,320px)] ${shadow}`} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" loading="lazy" className={`h-auto w-[clamp(112px,22vw,440px)] ${shadow}`} />
+        <img data-float src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" loading="lazy" className={`h-auto relative z-10 w-[40vw] md:w-[clamp(112px,22vw,440px)] ${shadow}`} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`h-auto w-[clamp(90px,18vw,360px)] rotate-[8deg] ${shadow}`} />
+        <img data-float src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`h-auto relative z-0 -ml-[7vw] w-[34vw] rotate-[8deg] md:m-0 md:w-[clamp(90px,18vw,360px)] ${shadow}`} />
       </div>
     </section>
   );

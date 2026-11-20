@@ -26,8 +26,9 @@ export function Benefits() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.registerPlugin(ScrollTrigger);
-    const ctx = gsap.context(() => {
-      // La palta avanza y gira sobre la línea mientras se recorre la sección (la línea baja hacia la derecha).
+    const mm = gsap.matchMedia(root.current!);
+    // Escritorio: la palta avanza y gira sobre la línea (que baja hacia la derecha) y las cards entran alternando lados.
+    mm.add("(min-width: 768px)", () => {
       gsap.fromTo(
         "[data-protagonista]",
         { rotation: -16, x: -34, y: -38, scale: 0.94 },
@@ -42,20 +43,34 @@ export function Benefits() {
           scrollTrigger: { trigger: el, start: "top 85%", once: true },
         });
       });
-    }, root);
-    return () => ctx.revert();
+    });
+    // Móvil (como More): la palta queda quieta arriba, solo flota; las cards entran en una columna con fade-up y 100 ms entre cada una.
+    mm.add("(max-width: 767px)", () => {
+      gsap.to("[data-protagonista]", { y: -12, duration: 3, ease: "sine.inOut", yoyo: true, repeat: -1 });
+      gsap.utils.toArray<HTMLElement>("[data-benefit]").forEach((el, i) => {
+        gsap.from(el, {
+          autoAlpha: 0,
+          y: 30,
+          duration: 0.6,
+          delay: i * 0.1,
+          ease: "power2.out",
+          scrollTrigger: { trigger: el, start: "top 80%", once: true },
+        });
+      });
+    });
+    return () => mm.revert();
   }, []);
 
   return (
-    <section ref={root} id="beneficios" className="scroll-mt-16 relative overflow-hidden bg-muted pt-28 pb-24">
-      <svg viewBox="0 0 1360 1000" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-0 size-full">
+    <section ref={root} id="beneficios" className="scroll-mt-16 relative overflow-hidden bg-muted pt-20 pb-16 md:pt-28 md:pb-24">
+      <svg viewBox="0 0 1360 1000" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-0 hidden size-full md:block">
         <path d="M-20 140 C 300 40, 560 260, 700 420 S 1120 760, 1400 640" fill="none" stroke="#fff" strokeWidth="10" strokeLinecap="round" />
       </svg>
 
       <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-8 px-8">
-        <div className="flex flex-col gap-6">{beneficios.izquierda.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
+        <div className="flex flex-col gap-4 md:gap-6">{beneficios.izquierda.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
 
-        <div className="flex items-center justify-center py-10">
+        <div className="order-first flex items-center justify-center py-2 md:order-none md:py-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             data-protagonista
@@ -63,11 +78,11 @@ export function Benefits() {
             width={770}
             height={1093}
             alt="Palta Hass madura"
-            className="h-auto w-[min(340px,70vw)] select-none drop-shadow-[0_28px_28px_rgba(22,51,30,.22)] motion-reduce:rotate-[12deg]"
+            className="h-auto w-[min(240px,62vw)] select-none drop-shadow-[0_28px_28px_rgba(22,51,30,.22)] md:w-[min(340px,70vw)] md:motion-reduce:rotate-[12deg]"
           />
         </div>
 
-        <div className="flex flex-col gap-6 pt-24">{beneficios.derecha.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
+        <div className="flex flex-col gap-4 md:gap-6 md:pt-24">{beneficios.derecha.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
       </div>
 
       <p className="relative z-10 mx-auto mt-12 max-w-[1200px] px-8 text-base text-muted-foreground">{beneficios.fuente}</p>
