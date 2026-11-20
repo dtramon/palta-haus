@@ -11,6 +11,11 @@ export const recetas = [
     overlap: "mr-[-26px]",
     z: "z-0",
     shadow: "shadow-[0_10px_30px_rgba(22,51,30,.16)]",
+    // escritorio (≥1024 px), en unidades u = min(1vw, 1.7778vh), igual que More Nutrition
+    w: 25,
+    l: -3,
+    t: 31,
+    shu: 2.5,
   },
   {
     id: "palta-reina",
@@ -24,6 +29,11 @@ export const recetas = [
     overlap: "",
     z: "z-20",
     shadow: "shadow-[0_14px_40px_rgba(22,51,30,.2)]",
+    // escritorio (≥1024 px), en unidades u = min(1vw, 1.7778vh), igual que More Nutrition
+    w: 28,
+    l: 19,
+    t: 24,
+    shu: -1,
   },
   {
     id: "ensalada",
@@ -37,6 +47,11 @@ export const recetas = [
     overlap: "ml-[-26px]",
     z: "z-10",
     shadow: "shadow-[0_10px_30px_rgba(22,51,30,.16)]",
+    // escritorio (≥1024 px), en unidades u = min(1vw, 1.7778vh), igual que More Nutrition
+    w: 25,
+    l: 41,
+    t: 32,
+    shu: 2,
   },
 ];
 
