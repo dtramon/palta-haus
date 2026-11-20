@@ -5,7 +5,7 @@ import { etiquetas, recetas } from "@/lib/content";
 
 export function Recipes() {
   return (
-    <section id="recetas" className="relative overflow-hidden bg-background pt-32 pb-24">
+    <section id="recetas" className="scroll-mt-16 relative overflow-hidden bg-background pt-32 pb-24">
       <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-14 px-8">
         <h2 className="display m-0 text-balance text-center text-[clamp(56px,8vw,120px)] leading-[.88]">
           Una palta,<br /><span className="text-[#6f9a3a]">mil formas de comerla.</span>

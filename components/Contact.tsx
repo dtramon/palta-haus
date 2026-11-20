@@ -5,7 +5,7 @@ import { site, whatsappUrl } from "@/lib/site";
 export function Contact() {
   const wa = whatsappUrl("Hola, quiero cotizar paltas.");
   return (
-    <section id="cotizar" className="relative bg-background pt-28 pb-24">
+    <section id="cotizar" className="scroll-mt-16 relative bg-background pt-28 pb-24">
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-start gap-14 px-8">
         <div className="flex min-w-0 flex-[1_1_380px] flex-col gap-6">
           <h2 className="display m-0 text-balance text-[clamp(60px,8vw,124px)] leading-[.86]">Contáctanos para precios minorista y mayorista.</h2>
