@@ -22,7 +22,7 @@ export function Recipes() {
           ))}
         </div>
 
-        <div className="flex max-w-[520px] min-w-0 flex-col gap-6 lg:absolute lg:left-[calc(var(--u)*67)] lg:top-[calc(var(--u)*30)] lg:w-[calc(var(--u)*30)] lg:max-w-none lg:gap-[calc(var(--u)*1.7)] lg:text-[length:calc(var(--u)*1.2)]">
+        <div className="flex max-w-[520px] min-w-0 flex-col gap-6 lg:absolute lg:left-[calc(var(--u)*72)] lg:top-[calc(var(--u)*30)] lg:w-[calc(var(--u)*26.5)] lg:max-w-none lg:gap-[calc(var(--u)*1.7)] lg:text-[length:calc(var(--u)*1.2)]">
           <p className="display m-0 text-balance text-[clamp(34px,5vw,50px)] leading-[.95] font-semibold text-primary lg:text-[length:calc(var(--u)*3.6)]">
             De la marraqueta de la once a la palta reina del domingo.
           </p>
