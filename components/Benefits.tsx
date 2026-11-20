@@ -12,11 +12,11 @@ type Item = { title: string; dato: string; texto: string };
 
 function BenefitCard({ title, dato, texto }: Item) {
   return (
-    <Card data-benefit className="stage-card flex flex-col gap-2 rounded-[calc(var(--radius)+8px)] p-5 md:gap-2.5 md:p-7">
-      <span aria-hidden="true" className="inline-flex size-11 items-center justify-center md:size-[52px] rounded-full border-2 border-dashed border-primary text-[10px] font-bold">ÍCONO</span>
-      <h3 className="display m-0 text-[34px] leading-[.88] uppercase md:text-[46px]">{title}</h3>
-      <p className="m-0 text-[18px] font-bold md:text-[22px]">{dato}</p>
-      <p className="m-0 text-[16px] leading-[1.3] text-muted-foreground md:text-[19px]">{texto}</p>
+    <Card data-benefit className="stage-card flex flex-col gap-2 rounded-[calc(var(--radius)+8px)] p-6 md:gap-2.5 md:p-7">
+      <span aria-hidden="true" className="inline-flex size-[52px] items-center justify-center rounded-full border-2 border-dashed border-primary text-[10px] font-bold">ÍCONO</span>
+      <h3 className="display m-0 text-[46px] leading-[.88] uppercase">{title}</h3>
+      <p className="m-0 text-[22px] font-bold">{dato}</p>
+      <p className="m-0 text-[19px] leading-[1.3] text-muted-foreground">{texto}</p>
     </Card>
   );
 }
@@ -136,7 +136,7 @@ export function Benefits() {
           <div
             data-protagonista
             style={{ aspectRatio: `${giroPalta.width} / ${giroPalta.height}` }}
-            className="relative w-[min(240px,62vw)] select-none drop-shadow-[0_28px_28px_rgba(22,51,30,.22)] md:w-[min(340px,70vw)] md:motion-reduce:rotate-[12deg]"
+            className="relative w-[min(270px,70vw)] select-none drop-shadow-[0_28px_28px_rgba(22,51,30,.22)] md:w-[min(340px,70vw)] md:motion-reduce:rotate-[12deg]"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" className="absolute inset-0 size-full object-contain" />
