@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Del árbol a tu mesa. Paltas Hass de La Cruz, región de Valparaíso. Contáctanos para precios minorista y mayorista.",
 };
 
-export const viewport: Viewport = { themeColor: "#eaf1e4" };
+export const viewport: Viewport = { themeColor: "#e8efe4" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
