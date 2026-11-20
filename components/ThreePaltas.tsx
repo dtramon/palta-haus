@@ -22,6 +22,10 @@ export function ThreePaltas() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.registerPlugin(ScrollTrigger);
     const ctx = gsap.context(() => {
+      // Móvil (como More): las 3 paltas suben juntas y las de los lados quedan cortadas por los bordes de la pantalla.
+      if (window.matchMedia("(max-width: 767px)").matches) {
+        gsap.from("[data-paltas] > img", { y: 140, autoAlpha: 0, duration: 1, stagger: 0.12, ease: "power3.out", scrollTrigger: { trigger: "[data-paltas]", start: "top 85%", once: true } });
+      }
       gsap.utils.toArray<HTMLElement>("[data-float]").forEach((el, i) => {
         gsap.to(el, { yPercent: i % 2 ? -5 : 5, duration: 2.6 + (i % 4) * 0.7, ease: "sine.inOut", yoyo: true, repeat: -1, delay: i * 0.3 });
       });
@@ -34,7 +38,7 @@ export function ThreePaltas() {
   }, []);
 
   return (
-    <section ref={root} className="relative flex min-h-[760px] flex-col items-center justify-center gap-10 overflow-hidden bg-background px-8 py-24">
+    <section ref={root} className="relative flex min-h-[760px] flex-col items-center justify-center gap-10 overflow-hidden bg-background px-8 pb-24 pt-10 md:py-24">
       {hojas.map((h) => (
         <div key={h.src} data-parallax={h.depth} aria-hidden="true" className={`pointer-events-none absolute z-0 ${h.cls}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -46,13 +50,13 @@ export function ThreePaltas() {
         Paltas en su punto.<br /><span className="text-foreground">¿Cuántas necesitas?</span>
       </h2>
 
-      <div className="relative z-10 flex w-[calc(100%+4rem)] items-end justify-center md:w-auto md:flex-wrap md:gap-[clamp(6px,2vw,48px)]">
+      <div data-paltas className="relative z-10 flex w-[calc(100%+4rem)] items-end justify-start md:w-auto md:flex-wrap md:justify-center md:gap-[clamp(6px,2vw,48px)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`h-auto relative z-0 -mr-[7vw] w-[32vw] -rotate-[9deg] md:m-0 md:w-[clamp(84px,16vw,320px)] ${shadow}`} />
+        <img data-float src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`h-auto relative z-0 -ml-[14vw] w-[46vw] shrink-0 -rotate-[9deg] md:m-0 md:w-[clamp(84px,16vw,320px)] ${shadow}`} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" loading="lazy" className={`h-auto relative z-10 w-[40vw] md:w-[clamp(112px,22vw,440px)] ${shadow}`} />
+        <img data-float src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" loading="lazy" className={`h-auto relative z-10 -ml-[8vw] w-[56vw] shrink-0 md:m-0 md:w-[clamp(112px,22vw,440px)] ${shadow}`} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`h-auto relative z-0 -ml-[7vw] w-[34vw] rotate-[8deg] md:m-0 md:w-[clamp(90px,18vw,360px)] ${shadow}`} />
+        <img data-float src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`h-auto relative z-0 -ml-[8vw] w-[48vw] shrink-0 rotate-[8deg] md:m-0 md:w-[clamp(90px,18vw,360px)] ${shadow}`} />
       </div>
     </section>
   );

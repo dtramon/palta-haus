@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { CustomEase } from "gsap/CustomEase";
 import { Card } from "./ui/card";
 import { beneficios } from "@/lib/content";
 
@@ -10,11 +11,11 @@ type Item = { title: string; dato: string; texto: string };
 
 function BenefitCard({ title, dato, texto }: Item) {
   return (
-    <Card data-benefit className="flex flex-col gap-2.5 rounded-[calc(var(--radius)+8px)] p-7">
-      <span aria-hidden="true" className="inline-flex size-[52px] items-center justify-center rounded-full border-2 border-dashed border-primary text-[10px] font-bold">ÍCONO</span>
-      <h3 className="display m-0 text-[46px] leading-[.88] uppercase">{title}</h3>
-      <p className="m-0 text-[22px] font-bold">{dato}</p>
-      <p className="m-0 text-[19px] leading-[1.3] text-muted-foreground">{texto}</p>
+    <Card data-benefit className="stage-card flex flex-col gap-2 rounded-[calc(var(--radius)+8px)] p-5 md:gap-2.5 md:p-7">
+      <span aria-hidden="true" className="inline-flex size-11 items-center justify-center md:size-[52px] rounded-full border-2 border-dashed border-primary text-[10px] font-bold">ÍCONO</span>
+      <h3 className="display m-0 text-[34px] leading-[.88] uppercase md:text-[46px]">{title}</h3>
+      <p className="m-0 text-[18px] font-bold md:text-[22px]">{dato}</p>
+      <p className="m-0 text-[16px] leading-[1.3] text-muted-foreground md:text-[19px]">{texto}</p>
     </Card>
   );
 }
@@ -44,33 +45,55 @@ export function Benefits() {
         });
       });
     });
-    // Móvil (como More): la palta queda quieta arriba, solo flota; las cards entran en una columna con fade-up y 100 ms entre cada una.
+    // Móvil (como More): escena fija a pantalla completa. La palta queda centrada y se inclina con el scroll
+    // mientras las cards suben desde abajo, se detienen un instante bajo ella y salen por arriba.
     mm.add("(max-width: 767px)", () => {
-      gsap.to("[data-protagonista]", { y: -12, duration: 3, ease: "sine.inOut", yoyo: true, repeat: -1 });
-      gsap.utils.toArray<HTMLElement>("[data-benefit]").forEach((el, i) => {
-        gsap.from(el, {
-          autoAlpha: 0,
-          y: 30,
-          duration: 0.6,
-          delay: i * 0.1,
-          ease: "power2.out",
-          scrollTrigger: { trigger: el, start: "top 80%", once: true },
-        });
+      const sec = root.current!;
+      gsap.registerPlugin(CustomEase);
+      sec.dataset.stage = "true";
+      const stage = sec.querySelector<HTMLElement>(".stage")!;
+      const cards = gsap.utils.toArray<HTMLElement>("[data-benefit]", sec);
+      const palta = sec.querySelector<HTMLElement>("[data-protagonista]")!;
+      const H = () => window.innerHeight;
+      const pass = CustomEase.create("cardPass", "M0,0 C0,0.201 0.098,0.459 0.5,0.5 0.904,0.541 1,0.805 1,1");
+      const STEP = 0.85;
+
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: { trigger: stage, start: "top top", end: () => "+=" + Math.round(H() * 3.7), scrub: 0.7, pin: true, anticipatePin: 1, invalidateOnRefresh: true },
       });
+      tl.fromTo(
+        cards,
+        { yPercent: 50, y: () => H() * 0.6, xPercent: (i: number) => (i % 2 ? -4 : 4), rotation: 0 },
+        { yPercent: -50, y: () => -H() * 0.6, xPercent: 0, rotation: (i: number) => (i % 2 ? 1 : -1) * (2 + (i % 3)), duration: 1, stagger: STEP, ease: pass },
+        0,
+      );
+      // Entrada de la palta: sube grande e inclinada y se asienta en el centro.
+      tl.fromTo(palta, { y: () => H() * 0.28, scale: 1.3, rotation: -18 }, { y: 0, scale: 1, rotation: 0, duration: 0.7, ease: "power2.out" }, 0);
+      // Cada vez que una card pasa por debajo, la palta se ladea y gira un poco sobre su eje.
+      cards.forEach((_, i) => {
+        const k = i % 2 ? -1 : 1;
+        tl.to(palta, { keyframes: [{ rotation: k * 12, rotationY: k * 32, scale: 1.04, duration: 0.4 }, { rotation: 0, rotationY: 0, scale: 1, duration: 0.4 }], ease: "sine.inOut" }, STEP * i + 0.75);
+      });
+      gsap.set(palta, { transformPerspective: 900 });
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+      return () => {
+        delete sec.dataset.stage;
+      };
     });
     return () => mm.revert();
   }, []);
 
   return (
-    <section ref={root} id="beneficios" className="scroll-mt-16 relative overflow-hidden bg-background pt-20 pb-16 md:pt-28 md:pb-24">
+    <section ref={root} id="beneficios" className="stage-section scroll-mt-16 relative overflow-hidden bg-background pt-20 pb-16 md:pt-28 md:pb-24">
       <svg viewBox="0 0 1360 1000" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-0 hidden size-full md:block">
         <path d="M-20 140 C 300 40, 560 260, 700 420 S 1120 760, 1400 640" fill="none" stroke="#fff" strokeWidth="10" strokeLinecap="round" />
       </svg>
 
-      <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-8 px-8">
-        <div className="flex flex-col gap-4 md:gap-6">{beneficios.izquierda.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
+      <div className="stage relative z-10 mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-8 px-8">
+        <div className="stage-col flex flex-col gap-4 md:gap-6">{beneficios.izquierda.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
 
-        <div className="order-first flex items-center justify-center py-2 md:order-none md:py-10">
+        <div className="stage-palta order-first flex items-center justify-center py-2 md:order-none md:py-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             data-protagonista
@@ -82,7 +105,7 @@ export function Benefits() {
           />
         </div>
 
-        <div className="flex flex-col gap-4 md:gap-6 md:pt-24">{beneficios.derecha.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
+        <div className="stage-col flex flex-col gap-4 md:gap-6 md:pt-24">{beneficios.derecha.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
       </div>
 
       <p className="relative z-10 mx-auto mt-12 max-w-[1200px] px-8 text-base text-muted-foreground">{beneficios.fuente}</p>

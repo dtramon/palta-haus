@@ -74,3 +74,14 @@ body {
   background-color: var(--muted);
   background-image: repeating-linear-gradient(135deg, var(--border) 0 2px, transparent 2px 18px);
 }
+
+
+/* Escenas 5 en móvil: escena fija a pantalla completa (se activa por JS con data-stage; sin JS o con movimiento reducido queda una columna). */
+@media (max-width: 767px) {
+  .stage-section[data-stage="true"] { padding: 0; }
+  .stage-section[data-stage="true"] .stage { position: relative; display: block; height: 100svh; max-width: none; margin: 0; padding: 0; overflow: hidden; }
+  .stage-section[data-stage="true"] .stage-col { display: contents; }
+  .stage-section[data-stage="true"] .stage-card { position: absolute; top: 52%; left: 8vw; width: 84vw; }
+  .stage-section[data-stage="true"] .stage-palta { position: absolute; inset: 9% 0 auto 0; z-index: 20; padding: 0; pointer-events: none; }
+  .stage-section[data-stage="true"] > p { margin-top: 1.5rem; padding-bottom: 2.5rem; }
+}
