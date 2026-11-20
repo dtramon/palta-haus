@@ -6,19 +6,24 @@ const Tag = ({ children }: { children: React.ReactNode }) => (
   <span className="text-[13px] font-semibold tracking-[.14em] text-muted-foreground">{children}</span>
 );
 
+// En escritorio (≥1024 px) todo se mide en la unidad u = min(1vw, 1.7778vh), igual que Recetas, y se alinea con el header.
 function Overlay({ scrim = false }: { scrim?: boolean }) {
   return (
-    <div className="relative flex size-full flex-col justify-end">
+    <div className="[--u:min(1vw,1.7778vh)] relative flex size-full flex-col justify-end">
       {scrim && (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-background/80 via-background/45 to-transparent" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-background/75 via-background/35 to-transparent" />
       )}
-      <div className="relative mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-8 pb-14">
-        <h1 className="display m-0 text-[clamp(84px,15vw,230px)] leading-[.82]">Del árbol<br />a tu mesa.</h1>
-        <p className="m-0 max-w-[520px] text-2xl leading-tight text-primary">Paltas Hass de La Cruz, al por mayor y al detalle.</p>
-        <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
-          <CtaLink href="#cotizar">Pedir cotización</CtaLink>
-          <span className="inline-flex items-center gap-3 text-lg font-medium text-primary">
-            <span className="inline-block h-10 w-0.5 bg-primary" />Desliza para bajar
+      <div className="relative flex w-full flex-col gap-6 px-5 pb-14 sm:px-8 lg:gap-[calc(var(--u)*1.2)] lg:px-[max(32px,calc(var(--u)*2.5))] lg:pb-[max(56px,calc(var(--u)*3.5))]">
+        <h1 className="display m-0 text-[clamp(84px,15vw,230px)] leading-[.82] lg:whitespace-nowrap lg:text-[length:calc(var(--u)*11)]">
+          Del árbol <br className="lg:hidden" />a tu mesa.
+        </h1>
+        <p className="m-0 max-w-[520px] text-2xl leading-tight text-primary lg:max-w-none lg:text-[length:max(24px,calc(var(--u)*1.25))]">
+          Paltas Hass de La Cruz, al por mayor y al detalle.
+        </p>
+        <div className="flex flex-wrap items-center gap-x-7 gap-y-4 lg:gap-x-[max(28px,calc(var(--u)*1.5))]">
+          <CtaLink href="#cotizar" className="lg:text-[length:max(20px,calc(var(--u)*1.04))]">Pedir cotización</CtaLink>
+          <span className="inline-flex items-center gap-3 text-lg font-medium text-primary lg:text-[length:max(18px,calc(var(--u)*0.94))]">
+            <span className="inline-block h-10 w-0.5 bg-primary lg:h-[max(40px,calc(var(--u)*2.1))]" />Desliza para bajar
           </span>
         </div>
       </div>
@@ -57,7 +62,7 @@ function Placeholders() {
 export function Opening() {
   const s = sequences.apertura;
   return (
-    <ScrollSequence dir={s.dir} count={s.count} scrollLength="+=500%" fadeChildren={0.12} placeholder={<Placeholders />}>
+    <ScrollSequence dir={s.dir} dirHd={s.dirHd} count={s.count} scrollLength="+=500%" fadeChildren={0.12} placeholder={<Placeholders />}>
       <Overlay scrim />
     </ScrollSequence>
   );
