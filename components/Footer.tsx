@@ -5,10 +5,8 @@ export function Footer() {
     <footer className="bg-primary py-12 text-primary-foreground">
       <div className="mx-auto flex max-w-[1200px] flex-wrap justify-between gap-6 px-8">
         <div className="flex items-center gap-2.5">
-          <svg width="36" height="36" viewBox="0 0 40 40" aria-hidden="true">
-            <path d="M20 3 L37 17 V36 H3 V17 Z" className="fill-accent" />
-            <circle cx="20" cy="25" r="7" className="fill-primary" />
-          </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo-icon.png" width={179} height={256} alt="" aria-hidden="true" className="h-11 w-auto" />
           <span className="display text-[32px] leading-none">{site.name}</span>
         </div>
         <div className="flex flex-col gap-1.5 text-lg leading-snug text-secondary">
