@@ -27,5 +27,5 @@ Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · GSAP + Scrol
 - Videos de recetas: conectados (`public/recetas/{marraqueta,palta-reina,ensalada}.mp4`, 576 px de ancho, mudos, comprimidos para web; carátulas `*-poster.jpg`). Los originales 1080p quedaron solo en el historial de git. Revisar con David el loop y la persona nueva de la 2.ª toma de la marraqueta.
 - Datos de contacto en `lib/site.ts` (`[TU NÚMERO]`, `[TU CORREO]`, `[@TU_USUARIO]`, `[TUS ZONAS]`, `[TIEMPO DE RESPUESTA]`). Con `whatsappE164` vacío el botón de WhatsApp no es enlace.
 - `app/api/cotizar/route.ts` valida y registra en el log; falta guardar el lead en Supabase.
-- Palta protagonista, 3 paltas (escena 6) e íconos de beneficios: placeholders hasta tener modelo 3D/frames.
+- Palta protagonista (escena 5) y 3 paltas (escena 6): CONECTADAS con fotos recortadas en `public/paltas/*.webp` (palta-1, palta-2, media, hoja-1…4; con transparencia). La protagonista gira y avanza con el scroll sobre la línea; las paltas y hojas flotan (GSAP, respeta reduced-motion). Pendiente: íconos de beneficios (placeholders) y, a futuro, modelo 3D.
 - Escena 7: el círculo se cierra con `clip-path` sobre un placeholder; falta la secuencia de la palta cayendo al cajón.

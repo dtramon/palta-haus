@@ -27,6 +27,12 @@ export function Benefits() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.registerPlugin(ScrollTrigger);
     const ctx = gsap.context(() => {
+      // La palta avanza y gira sobre la línea mientras se recorre la sección (la línea baja hacia la derecha).
+      gsap.fromTo(
+        "[data-protagonista]",
+        { rotation: -16, x: -34, y: -38, scale: 0.94 },
+        { rotation: 22, x: 34, y: 38, scale: 1, ease: "none", scrollTrigger: { trigger: root.current, start: "top 70%", end: "bottom 30%", scrub: true } },
+      );
       gsap.utils.toArray<HTMLElement>("[data-benefit]").forEach((el, i) => {
         gsap.from(el, {
           autoAlpha: 0,
@@ -49,11 +55,16 @@ export function Benefits() {
       <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-8 px-8">
         <div className="flex flex-col gap-6">{beneficios.izquierda.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
 
-        <div className="flex flex-col items-center justify-center gap-4 py-10">
-          <span className="text-center text-[13px] font-semibold tracking-[.14em] text-muted-foreground">PLACEHOLDER · PALTA PROTAGONISTA</span>
-          <div className="flex aspect-[300/420] w-[min(300px,70vw)] items-center justify-center rounded-full border-2 border-primary bg-secondary p-6 text-center text-lg leading-snug font-semibold">
-            Modelo 3D o frames de la palta, inclinada sobre la línea
-          </div>
+        <div className="flex items-center justify-center py-10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            data-protagonista
+            src="/paltas/palta-1.webp"
+            width={770}
+            height={1093}
+            alt="Palta Hass madura"
+            className="h-auto w-[min(340px,70vw)] select-none drop-shadow-[0_28px_28px_rgba(22,51,30,.22)] motion-reduce:rotate-[12deg]"
+          />
         </div>
 
         <div className="flex flex-col gap-6 pt-24">{beneficios.derecha.map((b) => <BenefitCard key={b.title} {...b} />)}</div>
