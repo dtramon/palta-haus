@@ -6,10 +6,13 @@ const Tag = ({ children }: { children: React.ReactNode }) => (
   <span className="text-[13px] font-semibold tracking-[.14em] text-muted-foreground">{children}</span>
 );
 
-function Overlay() {
+function Overlay({ scrim = false }: { scrim?: boolean }) {
   return (
-    <div className="flex size-full flex-col justify-end">
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-8 pb-14">
+    <div className="relative flex size-full flex-col justify-end">
+      {scrim && (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-background/80 via-background/45 to-transparent" />
+      )}
+      <div className="relative mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-8 pb-14">
         <h1 className="display m-0 text-[clamp(84px,15vw,230px)] leading-[.82]">Del árbol<br />a tu mesa.</h1>
         <p className="m-0 max-w-[520px] text-2xl leading-tight text-primary">Paltas Hass de La Cruz, al por mayor y al detalle.</p>
         <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
@@ -54,8 +57,8 @@ function Placeholders() {
 export function Opening() {
   const s = sequences.apertura;
   return (
-    <ScrollSequence dir={s.dir} count={s.count} placeholder={<Placeholders />}>
-      <Overlay />
+    <ScrollSequence dir={s.dir} count={s.count} scrollLength="+=500%" fadeChildren={0.12} placeholder={<Placeholders />}>
+      <Overlay scrim />
     </ScrollSequence>
   );
 }

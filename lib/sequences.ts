@@ -1,6 +1,6 @@
 // Secuencias de frames del scroll. `count: 0` = aún no hay frames y se muestra el placeholder del mockup.
 // Cuando existan, guardar los frames como /public/frames/<nombre>/0001.webp, 0002.webp… y poner aquí la cantidad.
 export const sequences = {
-  apertura: { dir: "/frames/apertura", count: 0 }, // campo → zoom al árbol → cae la palta (escenas 1–3)
+  apertura: { dir: "/frames/apertura", count: 141 }, // campo → zoom al árbol → cae la palta (escenas 1–3). 1280×720 webp (clips de Kling a 12 fps)
   cajon: { dir: "/frames/cajon", count: 0 }, // la palta cae al cajón (escena 7)
 };

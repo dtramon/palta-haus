@@ -12,19 +12,22 @@ type Props = {
   ext?: string;
   /** Largo del recorrido de scroll mientras la escena queda fija */
   scrollLength?: string;
+  /** Fracción inicial del recorrido (0–1) en la que el contenido (children) se desvanece. Sin valor = no se desvanece. */
+  fadeChildren?: number;
   placeholder: React.ReactNode;
   children?: React.ReactNode;
 };
 
 const pad = (n: number) => String(n).padStart(4, "0");
 
-export function ScrollSequence({ dir, count, ext = "webp", scrollLength = "+=300%", placeholder, children }: Props) {
+export function ScrollSequence({ dir, count, ext = "webp", scrollLength = "+=300%", fadeChildren, placeholder, children }: Props) {
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
+  const overlay = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (count <= 0) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     gsap.registerPlugin(ScrollTrigger);
 
     const cv = canvas.current!;
@@ -49,7 +52,9 @@ export function ScrollSequence({ dir, count, ext = "webp", scrollLength = "+=300
       if (current >= 0) draw(current);
     };
 
-    for (let i = 1; i <= count; i++) {
+    // Con movimiento reducido solo se carga y dibuja el primer frame: sin pin ni animación.
+    const total = reduced ? 1 : count;
+    for (let i = 1; i <= total; i++) {
       const img = new Image();
       img.src = `${dir}/${pad(i)}.${ext}`;
       if (i === 1) img.onload = () => draw(0);
@@ -57,28 +62,36 @@ export function ScrollSequence({ dir, count, ext = "webp", scrollLength = "+=300
     }
     resize();
     window.addEventListener("resize", resize);
+    if (reduced) return () => window.removeEventListener("resize", resize);
 
     const state = { frame: 0 };
-    const tween = gsap.to(state, {
+    let tween: gsap.core.Tween | undefined;
+    tween = gsap.to(state, {
       frame: count - 1,
       ease: "none",
-      onUpdate: () => draw(Math.round(state.frame)),
+      onUpdate: () => {
+        draw(Math.round(state.frame));
+        if (fadeChildren && overlay.current) {
+          const k = Math.min(1, (tween?.scrollTrigger?.progress ?? 0) / fadeChildren);
+          gsap.set(overlay.current, { autoAlpha: 1 - k, y: -48 * k });
+        }
+      },
       scrollTrigger: { trigger: root.current, start: "top top", end: scrollLength, scrub: 0.5, pin: true },
     });
 
     return () => {
       window.removeEventListener("resize", resize);
-      tween.scrollTrigger?.kill();
-      tween.kill();
+      tween?.scrollTrigger?.kill();
+      tween?.kill();
     };
-  }, [dir, count, ext, scrollLength]);
+  }, [dir, count, ext, scrollLength, fadeChildren]);
 
   if (count <= 0) return <>{placeholder}</>;
 
   return (
     <section ref={root} id="inicio" className="relative h-screen w-full overflow-hidden bg-muted">
       <canvas ref={canvas} className="absolute inset-0 size-full" aria-hidden="true" />
-      <div className="relative z-10 size-full">{children}</div>
+      <div ref={overlay} className="relative z-10 size-full">{children}</div>
     </section>
   );
 }

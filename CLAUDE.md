@@ -23,7 +23,7 @@ Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · GSAP + Scrol
 - Respetar `prefers-reduced-motion` en toda animación.
 
 ## Pendientes conocidos
-- Frames de las secuencias (`lib/sequences.ts`, `count: 0` = placeholder): `apertura` (escenas 1–3) y `cajon` (escena 7). Formato `public/frames/<nombre>/0001.webp…`.
+- Frames de las secuencias (`lib/sequences.ts`, `count: 0` = placeholder): `apertura` (escenas 1–3) YA CONECTADA (141 frames 1280×720 webp, 9,3 MB: zoom del campo al árbol y caída de la palta; título que se desvanece en el 12 % inicial del scroll). Falta `cajon` (escena 7). Formato `public/frames/<nombre>/0001.webp…`.
 - Videos de recetas: conectados (`public/recetas/{marraqueta,palta-reina,ensalada}.mp4`, 576 px de ancho, mudos, comprimidos para web; carátulas `*-poster.jpg`). Los originales 1080p quedaron solo en el historial de git. Revisar con David el loop y la persona nueva de la 2.ª toma de la marraqueta.
 - Datos de contacto en `lib/site.ts` (`[TU NÚMERO]`, `[TU CORREO]`, `[@TU_USUARIO]`, `[TUS ZONAS]`, `[TIEMPO DE RESPUESTA]`). Con `whatsappE164` vacío el botón de WhatsApp no es enlace.
 - `app/api/cotizar/route.ts` valida y registra en el log; falta guardar el lead en Supabase.
