@@ -8,9 +8,9 @@ import { Card } from "./ui/card";
 import { beneficios } from "@/lib/content";
 import { giroPalta } from "@/lib/sequences";
 
-type Item = { title: string; dato: string; texto: string };
+export type Item = { title: string; dato: string; texto: string };
 
-function BenefitCard({ title, dato, texto }: Item) {
+export function BenefitCard({ title, dato, texto }: Item) {
   return (
     <Card data-benefit className="stage-card flex flex-col gap-2 rounded-[calc(var(--radius)+8px)] p-6 md:gap-2.5 md:p-7">
       <span aria-hidden="true" className="inline-flex size-[52px] items-center justify-center rounded-full border-2 border-dashed border-primary text-[10px] font-bold">ÍCONO</span>
@@ -29,23 +29,6 @@ export function Benefits() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.registerPlugin(ScrollTrigger);
     const mm = gsap.matchMedia(root.current!);
-    // Escritorio: la palta avanza y gira sobre la línea (que baja hacia la derecha) y las cards entran alternando lados.
-    mm.add("(min-width: 768px)", () => {
-      gsap.fromTo(
-        "[data-protagonista]",
-        { rotation: -16, x: -34, y: -38, scale: 0.94 },
-        { rotation: 22, x: 34, y: 38, scale: 1, ease: "none", scrollTrigger: { trigger: root.current, start: "top 70%", end: "bottom 30%", scrub: true } },
-      );
-      gsap.utils.toArray<HTMLElement>("[data-benefit]").forEach((el, i) => {
-        gsap.from(el, {
-          autoAlpha: 0,
-          x: i % 2 === 0 ? -48 : 48,
-          duration: 0.7,
-          ease: "power2.out",
-          scrollTrigger: { trigger: el, start: "top 85%", once: true },
-        });
-      });
-    });
     // Móvil (como More): escena fija a pantalla completa. La palta queda centrada y se inclina con el scroll
     // mientras las cards suben desde abajo, se detienen un instante bajo ella y salen por arriba.
     mm.add("(max-width: 767px)", () => {
@@ -124,7 +107,7 @@ export function Benefits() {
   }, []);
 
   return (
-    <section ref={root} id="beneficios" className="stage-section scroll-mt-16 relative overflow-hidden bg-background pt-20 pb-16 md:pt-28 md:pb-24">
+    <section ref={root} className="stage-section relative overflow-hidden bg-background pt-20 pb-16 md:hidden md:pt-28 md:pb-24 motion-reduce:md:block">
       <svg viewBox="0 0 1360 1000" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-0 hidden size-full md:block">
         <path d="M-20 140 C 300 40, 560 260, 700 420 S 1120 760, 1400 640" fill="none" stroke="#fff" strokeWidth="10" strokeLinecap="round" />
       </svg>

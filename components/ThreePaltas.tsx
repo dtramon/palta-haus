@@ -45,7 +45,7 @@ export function ThreePaltas() {
       const foto = viajera.querySelector<HTMLElement>("[data-foto]")!;
       const lados = gsap.utils.toArray<HTMLElement>("[data-lado]", sec);
       const prot = document.querySelector<HTMLElement>("[data-protagonista]");
-      const ben = document.getElementById("beneficios");
+      const ben = document.querySelector<HTMLElement>(".stage-section");
       const entrada = gsap.fromTo(lados, { y: 140, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1, stagger: 0.12, ease: "power3.out", paused: true });
       const stage = ben?.querySelector<HTMLElement>(".stage") ?? null;
       const stST = mobile ? ScrollTrigger.getAll().find((t) => t.pin === stage) : undefined;
@@ -134,7 +134,6 @@ export function ThreePaltas() {
       };
     };
     mm.add("(max-width: 767px)", () => travel(true));
-    mm.add("(min-width: 768px)", () => travel(false));
 
     return () => {
       mm.revert();
@@ -143,7 +142,7 @@ export function ThreePaltas() {
   }, []);
 
   return (
-    <section ref={root} style={{ clipPath: "inset(-150vh 0 0 0)" }} className="relative flex min-h-svh flex-col items-center bg-background px-6 pt-[9svh] md:px-8 md:pt-[12svh]">
+    <section ref={root} style={{ clipPath: "inset(-150vh 0 0 0)" }} className="relative flex min-h-svh flex-col items-center bg-background px-6 pt-[9svh] md:hidden md:px-8 md:pt-[12svh] motion-reduce:md:flex">
       {hojas.map((h) => (
         <div key={h.src} data-parallax={h.depth} aria-hidden="true" className={`pointer-events-none absolute z-0 ${h.cls}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
