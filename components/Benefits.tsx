@@ -12,11 +12,11 @@ export type Item = { title: string; dato: string; texto: string };
 
 export function BenefitCard({ title, dato, texto }: Item) {
   return (
-    <Card data-benefit className="stage-card flex flex-col gap-2 rounded-[calc(var(--radius)+8px)] p-6 md:gap-2.5 md:p-7">
-      <span aria-hidden="true" className="inline-flex size-[52px] items-center justify-center rounded-full border-2 border-dashed border-primary text-[10px] font-bold">ÍCONO</span>
-      <h3 className="display m-0 text-[46px] leading-[.88] uppercase">{title}</h3>
-      <p className="m-0 text-[22px] font-bold">{dato}</p>
-      <p className="m-0 text-[19px] leading-[1.3] text-muted-foreground">{texto}</p>
+    <Card data-benefit className="stage-card flex flex-col gap-2 rounded-[calc(var(--radius)+8px)] p-6 md:gap-[calc(10px*var(--kf,1))] md:p-[calc(28px*var(--kf,1))]">
+      <span aria-hidden="true" className="inline-flex size-[52px] items-center justify-center rounded-full border-2 border-dashed border-primary text-[10px] font-bold md:size-[calc(52px*var(--kf,1))]">ÍCONO</span>
+      <h3 className="display m-0 text-[46px] leading-[.88] uppercase md:text-[calc(46px*var(--kf,1))]">{title}</h3>
+      <p className="m-0 text-[22px] font-bold md:text-[calc(22px*var(--kf,1))]">{dato}</p>
+      <p className="m-0 text-[19px] leading-[1.3] text-muted-foreground md:text-[calc(19px*var(--kf,1))]">{texto}</p>
     </Card>
   );
 }

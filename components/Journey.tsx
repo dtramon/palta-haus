@@ -24,10 +24,10 @@ const lineas = [
 ];
 
 const hojas = [
-  { src: "/paltas/hoja-2.webp", w: 649, h: 729, cls: "left-[3%] top-[8%] w-[clamp(64px,9vw,190px)] -rotate-[18deg]" },
-  { src: "/paltas/hoja-4.webp", w: 522, h: 555, cls: "right-[5%] top-[12%] w-[clamp(56px,8vw,170px)] rotate-[14deg]" },
-  { src: "/paltas/hoja-1.webp", w: 520, h: 377, cls: "left-[9%] bottom-[9%] w-[clamp(56px,8vw,170px)] rotate-[10deg]" },
-  { src: "/paltas/hoja-3.webp", w: 561, h: 581, cls: "right-[8%] bottom-[7%] w-[clamp(64px,9vw,180px)] -rotate-[12deg]" },
+  { src: "/paltas/hoja-2.webp", w: 649, h: 729, cls: "left-[3%] top-[8%] w-[calc(130px*var(--k))] -rotate-[18deg]" },
+  { src: "/paltas/hoja-4.webp", w: 522, h: 555, cls: "right-[5%] top-[12%] w-[calc(115px*var(--k))] rotate-[14deg]" },
+  { src: "/paltas/hoja-1.webp", w: 520, h: 377, cls: "left-[9%] bottom-[9%] w-[calc(115px*var(--k))] rotate-[10deg]" },
+  { src: "/paltas/hoja-3.webp", w: 561, h: 581, cls: "right-[8%] bottom-[7%] w-[calc(130px*var(--k))] -rotate-[12deg]" },
 ];
 
 // Las cards alternan lados empezando por la derecha, como en More.
@@ -57,6 +57,18 @@ export function Journey() {
       const hojasEl = gsap.utils.toArray<HTMLElement>("[data-hoja]", sec);
       const lados = gsap.utils.toArray<HTMLElement>("[data-lado]", sec);
       const H = () => window.innerHeight;
+      // Tamaño de todo el conjunto: proporcional al diseño de 1440×900 (según el lado que limite), entre 0,8 y 2,2.
+      const setK = () => {
+        const W = window.innerWidth;
+        const k = gsap.utils.clamp(0.62, 2.2, Math.min(W / 1440, window.innerHeight / 900));
+        // Cards: nunca más anchas que el espacio libre entre el borde y la palta (sin solapar).
+        const cw = Math.min(520 * k, W / 2 - 230 * k);
+        sticky.style.setProperty("--k", String(k));
+        sticky.style.setProperty("--kf", String(Math.max(k, 0.8)));
+        sticky.style.setProperty("--cw", `${cw}px`);
+      };
+      setK();
+      ScrollTrigger.addEventListener("refreshInit", setK);
 
       // --- Giro: los frames avanzan con el scroll sobre un canvas (el img es la carátula hasta que carga el primero).
       const c2d = canvas.getContext("2d")!;
@@ -129,6 +141,7 @@ export function Journey() {
       requestAnimationFrame(() => ScrollTrigger.refresh());
       return () => {
         loader.kill();
+        ScrollTrigger.removeEventListener("refreshInit", setK);
         floats.forEach((f) => f.kill());
         canvas.style.opacity = "0";
         img.style.opacity = "1";
@@ -141,7 +154,7 @@ export function Journey() {
   return (
     <section ref={root} aria-label="Beneficios de la palta Hass" className="relative hidden bg-background md:block motion-reduce:md:hidden">
       <div data-wrap className="relative h-[840vh]">
-        <div data-sticky className="sticky top-0 h-screen overflow-hidden">
+        <div data-sticky style={{ "--k": 1, "--kf": 1, "--cw": "490px" } as React.CSSProperties} className="sticky top-0 h-screen overflow-hidden">
           {/* Líneas (detrás de todo) */}
           {lineas.map((l, i) => (
             <svg key={i} data-linea viewBox={l.vb} preserveAspectRatio="none" aria-hidden="true" style={{ top: l.top, height: l.h, overflow: "visible" }} className="pointer-events-none absolute left-0 z-0 w-full">
@@ -159,7 +172,7 @@ export function Journey() {
 
           {/* Título: sube por detrás de la palta */}
           <div className="pointer-events-none absolute inset-x-0 top-0 z-[5] flex justify-center px-8 pt-[12svh]">
-            <h2 data-titulo className="display m-0 max-w-[1100px] text-balance text-center text-[clamp(60px,9.7vw,140px)] leading-[.85] text-primary">
+            <h2 data-titulo className="display m-0 max-w-[calc(1100px*var(--k))] text-balance text-center text-[calc(140px*var(--k))] leading-[.85] text-primary">
               Paltas en su punto.<br /><span className="text-foreground">¿Cuántas necesitas?</span>
             </h2>
           </div>
@@ -167,22 +180,24 @@ export function Journey() {
           {/* Paltas laterales (suben al final) y hueco de la central */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[8] flex translate-y-[3%] items-end justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img data-lado data-float src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`relative h-auto w-[clamp(84px,13vw,260px)] translate-y-[6%] ${shadow}`} />
-            <div data-spacer aria-hidden="true" className="w-[clamp(112px,18vw,360px)]" style={{ aspectRatio: "770 / 1093" }} />
+            <img data-lado data-float src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`relative h-auto w-[calc(187px*var(--k))] translate-y-[6%] ${shadow}`} />
+            <div data-spacer aria-hidden="true" className="w-[calc(259px*var(--k))]" style={{ aspectRatio: "770 / 1093" }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img data-lado data-float src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`relative h-auto w-[clamp(90px,13vw,260px)] translate-y-[6%] ${shadow}`} />
+            <img data-lado data-float src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`relative h-auto w-[calc(187px*var(--k))] translate-y-[6%] ${shadow}`} />
           </div>
 
-          {/* Cards: cada una en su fila centrada; alternan lados */}
+          {/* Cards: cada una en su fila centrada; alternan lados. Ancho = espacio libre hasta la palta (--cw), escalado por --k desde el diseño de 1440×900. */}
           {orden.map((b, i) => (
-            <div key={b.title} className={`pointer-events-none absolute inset-0 z-10 flex items-center px-[4.3vw] ${i % 2 ? "justify-start" : "justify-end"}`}>
-              <div className="w-[38.5vw] max-w-[560px]"><BenefitCard {...b} /></div>
+            <div key={b.title} className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+              <div className={`flex w-[calc(100vw-80px*var(--k))] ${i % 2 ? "justify-start" : "justify-end"}`}>
+                <div className="w-[var(--cw)]"><BenefitCard {...b} /></div>
+              </div>
             </div>
           ))}
 
           {/* Palta protagonista: centrada y fija durante toda la escena */}
           <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
-            <div data-palta style={{ aspectRatio: `${giroPalta.width} / ${giroPalta.height}` }} className={`relative w-[min(340px,28vw)] select-none ${shadow}`}>
+            <div data-palta style={{ aspectRatio: `${giroPalta.width} / ${giroPalta.height}` }} className={`relative w-[calc(340px*var(--k))] select-none ${shadow}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" className="absolute inset-0 size-full object-contain" />
               <canvas aria-hidden="true" className="absolute inset-0 size-full opacity-0" />
