@@ -85,3 +85,9 @@ body {
   .stage-section[data-stage="true"] .stage-palta { position: absolute; inset: 7% 0 auto 0; z-index: 20; padding: 0; pointer-events: none; }
   .stage-section[data-stage="true"] > p { margin-top: 1.5rem; padding-bottom: 2.5rem; }
 }
+
+/* Escena 7: en el traspaso, la palta central de la escena 6 se oculta porque Cajon dibuja la misma palta en su lugar. */
+html[data-cajon] [data-sticky] [data-palta],
+html[data-cajon] [data-sticky] [data-palta] *,
+html[data-cajon] [data-viajera],
+html[data-cajon] [data-viajera] * { visibility: hidden !important; }

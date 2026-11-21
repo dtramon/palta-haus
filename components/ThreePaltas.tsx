@@ -160,10 +160,10 @@ export function ThreePaltas() {
         {/* Palta central = la protagonista de la escena 5 que llega hasta aquí (ver efecto). */}
         <div data-viajera className="relative z-10 w-[56vw] md:w-[clamp(112px,18vw,360px)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img data-float data-foto src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" className={`h-auto w-full ${shadow}`} />
+          <img data-foto src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" className={`h-auto w-full ${shadow}`} />
           {/* Último frame del giro (solo móvil): es lo que muestra la protagonista al soltarse de la escena fija y queda como palta central. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img data-float data-giro src={`${giroPalta.dir}/${String(giroPalta.count).padStart(4, "0")}.webp`} width={giroPalta.width} height={giroPalta.height} alt="" aria-hidden="true" className={`pointer-events-none absolute left-0 top-1/2 h-auto w-full -translate-y-1/2 opacity-0 md:hidden ${shadow}`} />
+          <img data-giro src={`${giroPalta.dir}/${String(giroPalta.count).padStart(4, "0")}.webp`} width={giroPalta.width} height={giroPalta.height} alt="" aria-hidden="true" className={`pointer-events-none absolute inset-0 size-full object-contain opacity-0 md:hidden ${shadow}`} />
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img data-float data-lado src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`absolute bottom-0 right-[-22vw] h-auto w-[48vw] rotate-[8deg] md:relative md:right-auto md:m-0 md:w-[clamp(90px,13vw,260px)] ${shadow}`} />
