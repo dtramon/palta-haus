@@ -159,6 +159,7 @@ export function Journey() {
         card: q<HTMLElement>("[data-card]"),
         info: q<HTMLElement>("[data-info]"),
         anchorTo: () => tl.scrollTrigger!.end - H() * 0.4,
+        spin: { state, frames: giroPalta.count, draw },
       });
       ScrollTrigger.addEventListener("refresh", ex.refresh);
       void DURACION;

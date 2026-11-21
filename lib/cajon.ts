@@ -34,6 +34,8 @@ export type CajonOpts = {
   info: HTMLElement;
   /** Scroll (px) al que llevar los enlaces a #cotizar. */
   anchorTo: () => number;
+  /** Giro de la palta durante la bajada: una vuelta completa con los frames del giro (state.frame 0 → frames-1). */
+  spin?: { state: { frame: number }; frames: number; draw: () => void; onStart?: () => void; onRewind?: () => void };
 };
 
 export function extendToCajon(tl: gsap.core.Timeline, o: CajonOpts) {
@@ -92,6 +94,16 @@ export function extendToCajon(tl: gsap.core.Timeline, o: CajonOpts) {
     .fromTo(o.card, { y: () => H() }, { y: 0, duration: 1, ease: "power2.out" }, 2.2)
     .fromTo(o.info, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 2.8)
     .to({}, { duration: 0.4 }, 3.2);
+  // 1b) mientras baja, la palta da una vuelta completa (los frames del giro, de 0 a 72)
+  if (o.spin) {
+    const sp = o.spin;
+    ext.fromTo(
+      sp.state,
+      { frame: 0 },
+      { frame: sp.frames - 1, duration: 1.5, ease: "power1.inOut", immediateRender: false, onStart: sp.onStart, onUpdate: sp.draw, onReverseComplete: sp.onRewind },
+      0,
+    );
+  }
   tl.add(ext, o.at);
 
   // Los valores con función (alturas, medidas) se recalculan porque la línea de tiempo principal usa invalidateOnRefresh.

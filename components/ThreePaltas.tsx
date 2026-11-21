@@ -146,6 +146,50 @@ export function ThreePaltas() {
       const paltas = q<HTMLElement>("[data-paltas]");
       const viajera = q<HTMLElement>("[data-viajera]");
       const H = () => window.innerHeight;
+
+      // Giro durante la bajada: los frames se dibujan en un canvas que reemplaza al último frame estático (misma imagen, sin salto).
+      const giroImg = q<HTMLElement>("[data-giro]");
+      const canvas = q<HTMLCanvasElement>("[data-giro-canvas]");
+      const c2d = canvas.getContext("2d")!;
+      canvas.width = giroPalta.width;
+      canvas.height = giroPalta.height;
+      const frames: HTMLImageElement[] = [];
+      const state = { frame: giroPalta.count - 1 };
+      let shown = false;
+      const draw = () => {
+        let i = Math.round(state.frame);
+        while (i > 0 && !(frames[i]?.complete && frames[i].naturalWidth)) i--;
+        const f = frames[i];
+        if (!f || !f.complete || !f.naturalWidth) return;
+        c2d.clearRect(0, 0, canvas.width, canvas.height);
+        c2d.drawImage(f, 0, 0, canvas.width, canvas.height);
+        if (!shown) {
+          shown = true;
+          canvas.style.opacity = "1";
+          giroImg.style.visibility = "hidden";
+        }
+      };
+      const rewind = () => {
+        shown = false;
+        state.frame = giroPalta.count - 1;
+        canvas.style.opacity = "0";
+        giroImg.style.visibility = "";
+      };
+      const loader = ScrollTrigger.create({
+        trigger: sec,
+        start: "top bottom+=2000",
+        once: true,
+        onEnter: () => {
+          if (frames.length) return;
+          for (let n = 0; n < giroPalta.count; n++) {
+            const im = new Image();
+            im.decoding = "async";
+            im.src = `${giroPalta.dir}/${String(n + 1).padStart(4, "0")}.webp`;
+            frames.push(im);
+          }
+        },
+      });
+
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: { trigger: sec, start: "top top", end: () => `+=${DURACION * H()}`, scrub: 0.5, pin: true, anticipatePin: 1, invalidateOnRefresh: true },
@@ -166,10 +210,13 @@ export function ThreePaltas() {
         card: q<HTMLElement>("[data-card]"),
         info: q<HTMLElement>("[data-info]"),
         anchorTo: () => tl.scrollTrigger!.end - H() * 0.4,
+        spin: { state, frames: giroPalta.count, draw, onRewind: rewind },
       });
       ScrollTrigger.addEventListener("refresh", ex.refresh);
       return () => {
         ScrollTrigger.removeEventListener("refresh", ex.refresh);
+        loader.kill();
+        rewind();
         ex.cleanup();
         tl.scrollTrigger?.kill();
         tl.kill();
@@ -212,6 +259,8 @@ export function ThreePaltas() {
               {/* Último frame del giro (solo móvil): es lo que muestra la protagonista al soltarse de la escena fija y queda como palta central. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img data-giro src={`${giroPalta.dir}/${String(giroPalta.count).padStart(4, "0")}.webp`} width={giroPalta.width} height={giroPalta.height} alt="" aria-hidden="true" className={`pointer-events-none absolute inset-0 size-full object-contain opacity-0 md:hidden ${shadow}`} />
+              {/* Mismo cuadro del giro, pero dibujado frame a frame: da la vuelta mientras la palta baja al cajón (solo móvil). */}
+              <canvas data-giro-canvas aria-hidden="true" className={`pointer-events-none absolute inset-0 size-full object-contain opacity-0 md:hidden ${shadow}`} />
             </div>
           </div>
           <div data-lw className="absolute bottom-0 right-[-22vw] w-[48vw] md:relative md:right-auto md:m-0 md:w-[clamp(90px,13vw,260px)]">
