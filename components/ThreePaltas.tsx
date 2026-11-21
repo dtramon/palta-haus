@@ -154,9 +154,9 @@ export function ThreePaltas() {
         Paltas en su punto.<br /><span className="text-foreground">¿Cuántas necesitas?</span>
       </h2>
 
-      <div data-paltas className="absolute inset-x-0 bottom-0 z-[5] flex translate-y-[3%] items-end justify-center">
+      <div data-paltas className="absolute inset-x-0 bottom-[4svh] z-[5] flex items-end justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float data-lado src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`absolute bottom-0 left-[-22vw] h-auto w-[48vw] translate-y-[12%] -rotate-[9deg] md:relative md:left-auto md:m-0 md:w-[clamp(84px,13vw,260px)] md:translate-y-[6%] ${shadow}`} />
+        <img data-float data-lado src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`absolute bottom-0 left-[-22vw] h-auto w-[48vw] -rotate-[9deg] md:relative md:left-auto md:m-0 md:w-[clamp(84px,13vw,260px)] ${shadow}`} />
         {/* Palta central = la protagonista de la escena 5 que llega hasta aquí (ver efecto). */}
         <div data-viajera className="relative z-10 w-[56vw] md:w-[clamp(112px,18vw,360px)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -166,7 +166,7 @@ export function ThreePaltas() {
           <img data-float data-giro src={`${giroPalta.dir}/${String(giroPalta.count).padStart(4, "0")}.webp`} width={giroPalta.width} height={giroPalta.height} alt="" aria-hidden="true" className={`pointer-events-none absolute left-0 top-1/2 h-auto w-full -translate-y-1/2 opacity-0 md:hidden ${shadow}`} />
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float data-lado src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`absolute bottom-0 right-[-22vw] h-auto w-[48vw] translate-y-[12%] rotate-[8deg] md:relative md:right-auto md:m-0 md:w-[clamp(90px,13vw,260px)] md:translate-y-[6%] ${shadow}`} />
+        <img data-float data-lado src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`absolute bottom-0 right-[-22vw] h-auto w-[48vw] rotate-[8deg] md:relative md:right-auto md:m-0 md:w-[clamp(90px,13vw,260px)] ${shadow}`} />
       </div>
     </section>
   );

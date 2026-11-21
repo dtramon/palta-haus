@@ -4,85 +4,68 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { QuoteForm } from "./QuoteForm";
-import { sequences } from "@/lib/sequences";
 import { smooth } from "@/lib/smooth";
 import { site } from "@/lib/site";
 
-const { dir, count } = sequences.cajon;
-const pad = (n: number) => String(n).padStart(4, "0");
-const FW = 1280;
-const FH = 720;
-// Centro y radio del grupo cajón + palta asentada dentro del frame de 1280×720 (el círculo se cierra sobre él).
-const CX = 640;
-const CY = 539;
+const shadow = "drop-shadow-[0_22px_22px_rgba(22,51,30,.2)]";
+// Línea del travesaño frontal del cajón (fracción de su alto): por delante de ella la palta queda tapada, como si cayera dentro.
+const RIEL = 0.618;
+// Cuánto de la palta queda escondida detrás del travesaño al asentarse (fracción de su alto).
+const HUNDIDA = 0.2;
 
-// Escena 7 (todo en una sola pantalla fija): la palta cae al cajón (1,5 pantallas de scroll), un círculo se cierra
-// sobre el cajón dejando el verde oscuro y el formulario sube desde abajo hasta quedar en el centro de la pantalla.
+// Escena 7 (todo en una sola pantalla fija): la misma palta protagonista baja hasta el cajón (1,5 pantallas de scroll) y,
+// mientras baja, un círculo se va cerrando sobre el cajón; al caer la palta el círculo termina de cerrarse dejando el verde
+// oscuro y el formulario sube desde abajo hasta quedar en el centro de la pantalla.
 export function Cajon() {
   const root = useRef<HTMLElement>(null);
   const disc = useRef<HTMLDivElement>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
+  const crate = useRef<HTMLDivElement>(null);
+  const palta = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLDivElement>(null);
   const info = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     gsap.registerPlugin(ScrollTrigger);
-    const cv = canvas.current!;
-    const ctx = cv.getContext("2d")!;
-    const frames: HTMLImageElement[] = [];
-    let current = 0;
+    const d = disc.current!;
+    const c = crate.current!;
+    const p = palta.current!;
 
-    // Encaje: cubre la pantalla, pero mostrando al menos el 62 % del ancho del frame (en vertical queda con bandas del color del fondo).
-    const fit = () => {
-      const w = cv.clientWidth;
-      const h = cv.clientHeight;
-      const s = Math.min(Math.max(w / FW, h / FH), w / (FW * 0.62));
-      return { s, ox: (w - FW * s) / 2, oy: (h - FH * s) / 2, w, h };
-    };
-    const draw = (i: number) => {
-      const img = frames[i];
-      if (!img || !img.complete || !img.naturalWidth) return;
-      const { s, ox, oy } = fit();
-      const dpr = cv.width / cv.clientWidth;
-      ctx.fillStyle = "#e8efe4";
-      ctx.fillRect(0, 0, cv.width, cv.height);
-      ctx.drawImage(img, ox * dpr, oy * dpr, FW * s * dpr, FH * s * dpr);
-      current = i;
-    };
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      cv.width = cv.clientWidth * dpr;
-      cv.height = cv.clientHeight * dpr;
-      draw(current);
-    };
+    // Posición final de la palta (px respecto al disco): asentada en el cajón, con su parte baja detrás del travesaño.
+    const finalY = () => c.offsetTop + RIEL * c.offsetHeight + HUNDIDA * p.offsetHeight - p.offsetHeight;
+    // Arranca asomando por el borde superior, para que la caída (y el círculo) se noten desde el primer scroll.
+    const startY = () => -p.offsetHeight * 0.35;
 
-    const total = reduced ? 1 : count;
-    for (let i = 1; i <= total; i++) {
-      const img = new Image();
-      img.src = `${dir}/${pad(reduced ? count : i)}.webp`;
-      if (i === 1) img.onload = () => draw(reduced ? 0 : 0);
-      frames.push(img);
+    if (reduced) {
+      gsap.set(p, { y: finalY });
+      const onResize = () => gsap.set(p, { y: finalY() });
+      window.addEventListener("resize", onResize);
+      return () => window.removeEventListener("resize", onResize);
     }
-    resize();
-    window.addEventListener("resize", resize);
-    if (reduced) return () => window.removeEventListener("resize", resize);
 
     const H = () => window.innerHeight;
-    // Posición del círculo (px de pantalla) y radio inicial: cubre toda la pantalla.
+    // Círculo: centrado en el cajón; radio inicial = hasta la esquina más lejana (cubre toda la pantalla).
     const geo = () => {
-      const { s, ox, oy, w, h } = fit();
-      const cx = ox + CX * s;
-      const cy = oy + CY * s;
-      return { cx, cy, r0: Math.hypot(Math.max(cx, w - cx), Math.max(cy, h - cy)) + 8 };
+      const cx = d.clientWidth / 2;
+      const cy = c.offsetTop + c.offsetHeight / 2;
+      const r0 = Math.hypot(Math.max(cx, d.clientWidth - cx), Math.max(cy, d.clientHeight - cy)) + 8;
+      const rCajon = Math.hypot(c.offsetWidth / 2, c.offsetHeight / 2) * 1.04;
+      return { cx, cy, r0, rCajon };
     };
     const circ = { r: 1 };
     const setClip = () => {
-      const { cx, cy, r0 } = geo();
-      disc.current!.style.clipPath = `circle(${circ.r * r0}px at ${cx}px ${cy}px)`;
+      const { cx, cy, r0, rCajon } = geo();
+      let r = circ.r * r0;
+      if (r > rCajon * 1.001) {
+        // Mientras cae, el círculo nunca se cierra más que lo que necesita la palta para seguir a la vista.
+        const y = Number(gsap.getProperty(p, "y")) || 0;
+        const need = Math.hypot(0, cy - (y + p.offsetHeight / 2)) + Math.hypot(p.offsetWidth / 2, p.offsetHeight / 2) + 12;
+        r = Math.max(r, need);
+      }
+      d.style.clipPath = `circle(${r}px at ${cx}px ${cy}px)`;
     };
 
-    const state = { frame: 0 };
+    gsap.set(p, { y: startY, rotation: -16 });
     gsap.set(card.current, { y: () => H(), autoAlpha: 1 });
     gsap.set(info.current, { autoAlpha: 0 });
     setClip();
@@ -92,7 +75,7 @@ export function Cajon() {
       scrollTrigger: {
         trigger: root.current,
         start: "top top",
-        end: () => `+=${3.9 * H()}`,
+        end: () => `+=${3.7 * H()}`,
         scrub: 0.5,
         pin: true,
         anticipatePin: 1,
@@ -100,14 +83,15 @@ export function Cajon() {
         onRefresh: setClip,
       },
     });
-    // 1) la palta cae: 1,5 pantallas de scroll
-    tl.to(state, { frame: count - 1, duration: 1.5, onUpdate: () => draw(Math.round(state.frame)) }, 0)
-      // 2) el círculo se cierra sobre el cajón
-      .to(circ, { r: 0, duration: 1, ease: "power1.in", onUpdate: setClip }, 1.5)
+    // 1) la palta baja (1,5 pantallas de scroll, acelerando como una caída) y el círculo empieza a cerrarse a la vez
+    tl.fromTo(p, { y: startY }, { y: finalY, rotation: 0, duration: 1.5, ease: "power1.in", immediateRender: false, onUpdate: setClip }, 0)
+      .to(circ, { r: () => geo().rCajon / geo().r0, duration: 1.5, ease: "none", onUpdate: setClip }, 0)
+      // 2) cae en el cajón y el círculo termina de cerrarse
+      .to(circ, { r: 0, duration: 0.7, ease: "power1.in", onUpdate: setClip }, 1.5)
       // 3) el formulario sube y queda fijo en el centro de la pantalla
-      .to(card.current, { y: 0, duration: 1, ease: "power2.out" }, 2.5)
-      .to(info.current, { autoAlpha: 1, duration: 0.4 }, 3.1)
-      .to({}, { duration: 0.4 }, 3.5);
+      .to(card.current, { y: 0, duration: 1, ease: "power2.out" }, 2.2)
+      .to(info.current, { autoAlpha: 1, duration: 0.4 }, 2.8)
+      .to({}, { duration: 0.4 }, 3.3);
 
     // Enlaces a #cotizar: llevan al final del recorrido (formulario ya centrado), no al inicio de la escena.
     const onClick = (e: MouseEvent) => {
@@ -123,7 +107,6 @@ export function Cajon() {
 
     return () => {
       document.removeEventListener("click", onClick, true);
-      window.removeEventListener("resize", resize);
       tl.scrollTrigger?.kill();
       tl.kill();
     };
@@ -131,10 +114,34 @@ export function Cajon() {
 
   return (
     <section ref={root} id="cotizar" className="relative h-svh min-h-[640px] overflow-hidden bg-primary motion-reduce:h-auto motion-reduce:min-h-0">
-      <div ref={disc} className="absolute inset-0 bg-background motion-reduce:relative motion-reduce:h-[70svh]">
-        <canvas ref={canvas} className="absolute inset-0 size-full" role="img" aria-label="Una palta cae en un cajón lleno de paltas Hass" />
+      <div
+        ref={disc}
+        style={{ "--cw": "min(88vw, 92svh)" } as React.CSSProperties}
+        className="absolute inset-0 bg-background motion-reduce:relative motion-reduce:h-[70svh] motion-reduce:[--cw:min(88vw,60svh)]"
+        role="img"
+        aria-label="Una palta Hass cae en un cajón lleno de paltas"
+      >
+        {/* Cajón: copia completa al fondo y, encima de la palta, solo el frente (travesaños) para que la palta caiga "dentro". */}
+        <div ref={crate} className="absolute bottom-[6svh] left-1/2 w-[var(--cw)] -translate-x-1/2" style={{ aspectRatio: "1400 / 824" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/paltas/cajon.webp" width={1400} height={824} alt="" className="absolute inset-0 size-full" />
+        </div>
+        <div className="absolute left-1/2 top-0 z-10 w-[calc(var(--cw)*0.27)] -translate-x-1/2" style={{ aspectRatio: "770 / 1093" }}>
+          <div ref={palta} className={`size-full ${shadow}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/paltas/palta-1.webp" width={770} height={1093} alt="" className="size-full" />
+          </div>
+        </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-[6svh] left-1/2 z-20 w-[var(--cw)] -translate-x-1/2"
+          style={{ aspectRatio: "1400 / 824", clipPath: `inset(${RIEL * 100}% 0 0 0)` }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/paltas/cajon.webp" width={1400} height={824} alt="" className="absolute inset-0 size-full" />
+        </div>
       </div>
-      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-4 px-4 pt-14 motion-reduce:relative motion-reduce:py-16">
+      <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 px-4 pt-14 motion-reduce:relative motion-reduce:py-16">
         <div ref={card} className="pointer-events-auto flex max-h-[calc(100svh-7rem)] w-[min(520px,100%)] overflow-y-auto rounded-[calc(var(--radius)+4px)] [&>*]:w-full">
           <QuoteForm />
         </div>

@@ -182,12 +182,12 @@ export function Journey() {
           </div>
 
           {/* Paltas laterales (suben al final) y hueco de la central */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[8] flex translate-y-[3%] items-end justify-center">
+          <div className="pointer-events-none absolute inset-x-0 bottom-[calc(36px*var(--k))] z-[8] flex items-end justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img data-lado data-float src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`relative h-auto w-[calc(187px*var(--k))] translate-y-[6%] ${shadow}`} />
+            <img data-lado data-float src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`relative h-auto w-[calc(187px*var(--k))] ${shadow}`} />
             <div data-spacer aria-hidden="true" className="w-[calc(259px*var(--k))]" style={{ aspectRatio: "770 / 1093" }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img data-lado data-float src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`relative h-auto w-[calc(187px*var(--k))] translate-y-[6%] ${shadow}`} />
+            <img data-lado data-float src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`relative h-auto w-[calc(187px*var(--k))] ${shadow}`} />
           </div>
 
           {/* Cards: cada una en su fila centrada; alternan lados. Ancho = espacio libre hasta la palta (--cw), escalado por --k desde el diseño de 1440×900. */}
