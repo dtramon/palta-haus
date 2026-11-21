@@ -6,7 +6,6 @@ import { Benefits } from "@/components/Benefits";
 import { Journey } from "@/components/Journey";
 import { ThreePaltas } from "@/components/ThreePaltas";
 import { Cajon } from "@/components/Cajon";
-import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 
 export default function Home() {
@@ -23,7 +22,6 @@ export default function Home() {
         </div>
         <ThreePaltas />
         <Cajon />
-        <Contact />
       </main>
       <Footer />
     </>

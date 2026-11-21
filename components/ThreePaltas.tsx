@@ -142,7 +142,7 @@ export function ThreePaltas() {
   }, []);
 
   return (
-    <section ref={root} style={{ clipPath: "inset(-150vh 0 0 0)" }} className="relative flex min-h-svh flex-col items-center bg-background px-6 pt-[9svh] md:hidden md:px-8 md:pt-[12svh] motion-reduce:md:flex">
+    <section ref={root} style={{ clipPath: "inset(-150vh 0 0 0)" }} className="relative flex overflow-x-clip min-h-svh flex-col items-center bg-background px-6 pt-[9svh] md:hidden md:px-8 md:pt-[12svh] motion-reduce:md:flex">
       {hojas.map((h) => (
         <div key={h.src} data-parallax={h.depth} aria-hidden="true" className={`pointer-events-none absolute z-0 ${h.cls}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
