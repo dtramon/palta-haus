@@ -7,6 +7,7 @@ import { CustomEase } from "gsap/CustomEase";
 import { Card } from "./ui/card";
 import { beneficios } from "@/lib/content";
 import { giroPalta } from "@/lib/sequences";
+import { GIRO_RHO, giroFrame } from "@/lib/giro";
 
 export type Item = { title: string; icono: string; dato: string; texto: string };
 
@@ -91,7 +92,9 @@ export function Benefits() {
           frames.push(im);
         }
       };
-      tl.to(state, { frame: giroPalta.count - 1, duration: 3.7, ease: "none", onUpdate: draw }, 0.7);
+      // Giro desde el primer instante y a velocidad constante respecto al scroll (la escena fija dura 3,7 alturas): sigue en el descenso y en el cajón.
+      const vueltas = { v: 0 };
+      tl.to(vueltas, { v: GIRO_RHO * 3.7, duration: 4.4, ease: "none", onUpdate: () => { state.frame = giroFrame(vueltas.v); draw(); } }, 0);
       const loader = ScrollTrigger.create({ trigger: stage, start: "top bottom+=1500", once: true, onEnter: load });
       ScrollTrigger.addEventListener("refresh", fit);
       gsap.set(palta, { transformPerspective: 900 });

@@ -7,6 +7,7 @@ import { CustomEase } from "gsap/CustomEase";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { beneficios } from "@/lib/content";
 import { giroPalta } from "@/lib/sequences";
+import { giroFrame } from "@/lib/giro";
 import { BenefitCard } from "./Benefits";
 import { CajonCrate, CotizarForm } from "./CajonLayer";
 import { DURACION, extendToCajon } from "@/lib/cajon";
@@ -133,7 +134,9 @@ export function Journey() {
       tl.fromTo(paths, { drawSVG: "100% 100%" }, { keyframes: [{ drawSVG: "0% 100%", duration: 0.5 }, { drawSVG: "0% 0%", duration: 0.5 }], stagger: 1.35 }, 0.3);
       // 3) Palta: gira con todo el scroll y se achica.
       tl.to(palta, { scale: 0.95, duration: 3.2 }, 0);
-      tl.to(state, { frame: giroPalta.count - 1, duration: 6.1, onUpdate: draw }, 0);
+      // Giro continuo en TODA la escena (cards, bajada y cajón): 2 vueltas exactas de 0 a 9,75 (= 7,55 + 2,2 de la escena 7), velocidad pareja.
+      const vueltas = { v: 0 };
+      tl.to(vueltas, { v: 2, duration: 9.75, ease: "none", onUpdate: () => { state.frame = giroFrame(vueltas.v); draw(); } }, 0);
       // 4) Al terminar las cards: el título sube por detrás de la palta y con él las hojas sueltas.
       tl.to(title, { y: 0, scale: 1, duration: 1.5, ease: "power2.out" }, 4.6);
       tl.to(hojasEl, { y: 0, autoAlpha: 1, scale: 1, duration: 1.4, ease: "power1.inOut", stagger: 0.1 }, 4.6);
@@ -159,7 +162,6 @@ export function Journey() {
         card: q<HTMLElement>("[data-card]"),
         info: q<HTMLElement>("[data-info]"),
         anchorTo: () => tl.scrollTrigger!.end - H() * 0.4,
-        spin: { state, frames: giroPalta.count, draw },
       });
       ScrollTrigger.addEventListener("refresh", ex.refresh);
       void DURACION;
