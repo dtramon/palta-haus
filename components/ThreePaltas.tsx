@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { giroPalta } from "@/lib/sequences";
+import { DURACION, extendToCajon } from "@/lib/cajon";
+import { CajonCrate, CotizarEstatico, CotizarForm } from "./CajonLayer";
 
 // Hojas flotantes: posición, tamaño, giro fijo y "profundidad" para el efecto de paralaje.
 const hojas = [
@@ -87,7 +89,8 @@ export function ThreePaltas() {
         const r = viajera.getBoundingClientRect();
         const W = viajera.offsetWidth;
         g.Cn = r.top + s + r.height / 2;
-        g.sL = sec.getBoundingClientRect().top + s; // la escena alineada con la pantalla: la viajera ya está en su sitio
+        const holder = sec.parentElement?.classList.contains("pin-spacer") ? sec.parentElement : sec; // con la escena fija, el contenedor del pin conserva la posición original
+        g.sL = holder.getBoundingClientRect().top + s; // la escena alineada con la pantalla: la viajera ya está en su sitio
         if (mobile) {
           g.sH = stST!.end; // fin de la escena fija: la protagonista queda arriba, a 7 % del alto
           g.vc0 = 0.07 * stage!.offsetHeight + prot.offsetHeight / 2;
@@ -135,6 +138,44 @@ export function ThreePaltas() {
     };
     mm.add("(max-width: 767px)", () => travel(true));
 
+    // Escena 7 en móvil: prolongación de esta misma pantalla. La escena se fija al quedar alineada y, con la palta central
+    // (la viajera) quieta, todo lo demás sube y se va, llega el cajón, el círculo se cierra y sube el formulario.
+    mm.add("(max-width: 767px)", () => {
+      const q = <T extends Element>(s: string) => sec.querySelector<T>(s)!;
+      const stage = q<HTMLElement>("[data-stage]");
+      const paltas = q<HTMLElement>("[data-paltas]");
+      const viajera = q<HTMLElement>("[data-viajera]");
+      const H = () => window.innerHeight;
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: { trigger: sec, start: "top top", end: () => `+=${DURACION * H()}`, scrub: 0.5, pin: true, anticipatePin: 1, invalidateOnRefresh: true },
+      });
+      const ex = extendToCajon(tl, {
+        at: 0,
+        stage,
+        geo: () => {
+          const a = paltas.getBoundingClientRect();
+          const b = stage.getBoundingClientRect();
+          return { cx: a.left - b.left + a.width / 2, bottom: a.bottom - b.top, w: viajera.offsetWidth };
+        },
+        shrink: q<HTMLElement>("[data-vin]"),
+        shrinkOrigin: () => "50% 100%",
+        world: [...gsap.utils.toArray<HTMLElement>("[data-world], [data-lw]", sec)],
+        crate: q<HTMLElement>("[data-crate]"),
+        front: q<HTMLElement>("[data-crate-front]"),
+        card: q<HTMLElement>("[data-card]"),
+        info: q<HTMLElement>("[data-info]"),
+        anchorTo: () => tl.scrollTrigger!.end - H() * 0.4,
+      });
+      ScrollTrigger.addEventListener("refresh", ex.refresh);
+      return () => {
+        ScrollTrigger.removeEventListener("refresh", ex.refresh);
+        ex.cleanup();
+        tl.scrollTrigger?.kill();
+        tl.kill();
+      };
+    });
+
     return () => {
       mm.revert();
       ctx.revert();
@@ -142,32 +183,49 @@ export function ThreePaltas() {
   }, []);
 
   return (
-    <section ref={root} style={{ clipPath: "inset(-150vh 0 0 0)" }} className="relative flex overflow-x-clip min-h-svh flex-col items-center bg-background px-6 pt-[9svh] md:hidden md:px-8 md:pt-[12svh] motion-reduce:md:flex">
-      {hojas.map((h) => (
-        <div key={h.src} data-parallax={h.depth} aria-hidden="true" className={`pointer-events-none absolute z-0 ${h.cls}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img data-float src={h.src} width={h.w} height={h.h} alt="" loading="lazy" className={`h-auto w-full ${shadow}`} />
-        </div>
-      ))}
+    <section ref={root} style={{ clipPath: "inset(-150vh 0 0 0)" }} className="relative overflow-x-clip bg-primary md:hidden motion-reduce:md:block">
+      <div data-stage className="relative flex min-h-svh flex-col items-center bg-background">
+        {/* Todo lo que sube y se va al bajar la cámara (escena 7): hojas y título */}
+        <div data-world className="absolute inset-0 flex flex-col items-center px-6 pt-[9svh] md:px-8 md:pt-[12svh]">
+          {hojas.map((h) => (
+            <div key={h.src} data-parallax={h.depth} aria-hidden="true" className={`pointer-events-none absolute z-0 ${h.cls}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img data-float src={h.src} width={h.w} height={h.h} alt="" loading="lazy" className={`h-auto w-full ${shadow}`} />
+            </div>
+          ))}
 
-      <h2 className="display relative z-10 m-0 max-w-[1100px] text-balance text-center text-[17vw] leading-[.85] md:text-[clamp(60px,9.7vw,140px)] text-primary">
-        Paltas en su punto.<br /><span className="text-foreground">¿Cuántas necesitas?</span>
-      </h2>
-
-      <div data-paltas className="absolute inset-x-0 bottom-[4svh] z-[5] flex items-end justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float data-lado src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`absolute bottom-0 left-[-22vw] h-auto w-[48vw] -rotate-[9deg] md:relative md:left-auto md:m-0 md:w-[clamp(84px,13vw,260px)] ${shadow}`} />
-        {/* Palta central = la protagonista de la escena 5 que llega hasta aquí (ver efecto). */}
-        <div data-viajera className="relative z-10 w-[56vw] md:w-[clamp(112px,18vw,360px)]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img data-foto src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" className={`h-auto w-full ${shadow}`} />
-          {/* Último frame del giro (solo móvil): es lo que muestra la protagonista al soltarse de la escena fija y queda como palta central. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img data-giro src={`${giroPalta.dir}/${String(giroPalta.count).padStart(4, "0")}.webp`} width={giroPalta.width} height={giroPalta.height} alt="" aria-hidden="true" className={`pointer-events-none absolute inset-0 size-full object-contain opacity-0 md:hidden ${shadow}`} />
+          <h2 className="display relative z-10 m-0 max-w-[1100px] text-balance text-center text-[17vw] leading-[.85] md:text-[clamp(60px,9.7vw,140px)] text-primary">
+            Paltas en su punto.<br /><span className="text-foreground">¿Cuántas necesitas?</span>
+          </h2>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-float data-lado src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`absolute bottom-0 right-[-22vw] h-auto w-[48vw] rotate-[8deg] md:relative md:right-auto md:m-0 md:w-[clamp(90px,13vw,260px)] ${shadow}`} />
+
+        <div data-paltas className="absolute inset-x-0 bottom-[4svh] z-[5] flex items-end justify-center">
+          <div data-lw className="absolute bottom-0 left-[-22vw] w-[48vw] md:relative md:left-auto md:m-0 md:w-[clamp(84px,13vw,260px)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img data-float data-lado src="/paltas/palta-2.webp" width={764} height={1096} alt="Palta Hass madura" loading="lazy" className={`h-auto w-full -rotate-[9deg] ${shadow}`} />
+          </div>
+          {/* Palta central = la protagonista de la escena 5 que llega hasta aquí (ver efecto). */}
+          <div data-viajera className="relative z-10 w-[56vw] md:w-[clamp(112px,18vw,360px)]">
+            <div data-vin className="relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img data-foto src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" className={`h-auto w-full ${shadow}`} />
+              {/* Último frame del giro (solo móvil): es lo que muestra la protagonista al soltarse de la escena fija y queda como palta central. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img data-giro src={`${giroPalta.dir}/${String(giroPalta.count).padStart(4, "0")}.webp`} width={giroPalta.width} height={giroPalta.height} alt="" aria-hidden="true" className={`pointer-events-none absolute inset-0 size-full object-contain opacity-0 md:hidden ${shadow}`} />
+            </div>
+          </div>
+          <div data-lw className="absolute bottom-0 right-[-22vw] w-[48vw] md:relative md:right-auto md:m-0 md:w-[clamp(90px,13vw,260px)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img data-float data-lado src="/paltas/media.webp" width={837} height={1227} alt="Media palta Hass con su carozo" loading="lazy" className={`h-auto w-full rotate-[8deg] ${shadow}`} />
+          </div>
+        </div>
+
+        {/* Escena 7: el cajón, entre las paltas (z-5) y su frente */}
+        <CajonCrate zBack="z-[4]" zFront="z-[6]" />
       </div>
+
+      <CotizarForm z="z-30" />
+      <CotizarEstatico />
     </section>
   );
 }

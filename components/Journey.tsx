@@ -8,12 +8,15 @@ import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { beneficios } from "@/lib/content";
 import { giroPalta } from "@/lib/sequences";
 import { BenefitCard } from "./Benefits";
+import { CajonCrate, CotizarForm } from "./CajonLayer";
+import { DURACION, extendToCajon } from "@/lib/cajon";
 
 /**
  * Escritorio, escenas 5 y 6 en una sola pantalla fija (como la secuencia de More): la palta queda en el centro y gira
  * con cada scroll; las cards pasan por los lados; tres líneas blancas se dibujan y se borran con el scroll; al terminar
  * las cards el título sube por detrás de la palta junto con las hojas sueltas; tras el último giro la palta baja recta
- * y entran las dos paltas laterales desde abajo. Con reduced-motion se muestran Benefits y ThreePaltas estáticos.
+ * y entran las dos paltas laterales desde abajo. La escena 7 (cajón + formulario) es la prolongación de esta misma pantalla
+ * fija y de esta misma línea de tiempo (ver lib/cajon.ts). Con reduced-motion se muestran Benefits y ThreePaltas estáticos.
  */
 
 // Trazados de las 3 líneas (los de More, con su viewBox) y su posición dentro de la pantalla fija.
@@ -56,6 +59,7 @@ export function Journey() {
       const paths = gsap.utils.toArray<SVGPathElement>("[data-linea] path", sec);
       const hojasEl = gsap.utils.toArray<HTMLElement>("[data-hoja]", sec);
       const lados = gsap.utils.toArray<HTMLElement>("[data-lado]", sec);
+      const stage = q<HTMLElement>("[data-stage]");
       const H = () => window.innerHeight;
       // Tamaño de todo el conjunto: proporcional al diseño de 1440×900 (según el lado que limite), entre 0,8 y 2,2.
       const setK = () => {
@@ -121,7 +125,7 @@ export function Journey() {
       gsap.set(hojasEl, { y: H(), autoAlpha: 0, scale: 0.5 });
       gsap.set(lados, { y: H() * 0.6 });
       gsap.set(palta, { scale: 1.25 });
-      const tl = gsap.timeline({ defaults: { ease: "none" }, scrollTrigger: { trigger: wrap, start: "top 60%", end: "bottom bottom", scrub: 0.7 } });
+      const tl = gsap.timeline({ defaults: { ease: "none" }, scrollTrigger: { trigger: wrap, start: "top 60%", end: "bottom bottom", scrub: 0.7, invalidateOnRefresh: true } });
 
       // 1) Cards: entran por abajo, se detienen un instante al centro y salen por arriba (curva y desfase de More).
       tl.to(cards, { yPercent: -50, y: -H() * 0.6, xPercent: 0, rotation: (i: number) => (i % 2 ? -1 : 1) * gsap.utils.random(2, 5), duration: 1, stagger: 0.85, ease: pass }, 0);
@@ -137,6 +141,28 @@ export function Journey() {
       tl.to(palta, { y: finalY, scale: finalScale, duration: 1, ease: "power2.inOut" }, 6.1);
       tl.to(lados, { y: 0, duration: 1, ease: "power2.out", stagger: 0.12 }, 6.35);
 
+      // 6) Escena 7, prolongación de esta misma pantalla: la cámara baja con la palta (título, hojas y laterales suben y se van),
+      // llega el cajón, el círculo se cierra y sube el formulario. La palta es la misma de arriba: no cambia de elemento.
+      const ex = extendToCajon(tl, {
+        at: 7.55,
+        stage,
+        geo: () => {
+          const a = spacer.getBoundingClientRect();
+          const b = sticky.getBoundingClientRect();
+          return { cx: a.left - b.left + a.width / 2, bottom: a.bottom - b.top, w: a.width * 0.9755 }; // el cuadro del giro es algo más ancho que la foto
+        },
+        shrink: q<HTMLElement>("[data-pwrap]"),
+        shrinkOrigin: (g) => `${g.cx}px ${g.bottom}px`,
+        world: [title, ...hojasEl, ...lados],
+        crate: q<HTMLElement>("[data-crate]"),
+        front: q<HTMLElement>("[data-crate-front]"),
+        card: q<HTMLElement>("[data-card]"),
+        info: q<HTMLElement>("[data-info]"),
+        anchorTo: () => tl.scrollTrigger!.end - H() * 0.4,
+      });
+      ScrollTrigger.addEventListener("refresh", ex.refresh);
+      void DURACION;
+
       // Las paltas y hojas flotan suavemente.
       const floats = gsap.utils.toArray<HTMLElement>("[data-float]", sec).map((el, i) =>
         gsap.to(el, { yPercent: i % 2 ? -5 : 5, duration: 2.6 + (i % 4) * 0.7, ease: "sine.inOut", yoyo: true, repeat: -1, delay: i * 0.3 }),
@@ -146,6 +172,8 @@ export function Journey() {
       return () => {
         loader.kill();
         ScrollTrigger.removeEventListener("refreshInit", setK);
+        ScrollTrigger.removeEventListener("refresh", ex.refresh);
+        ex.cleanup();
         floats.forEach((f) => f.kill());
         canvas.style.opacity = "0";
         img.style.opacity = "1";
@@ -157,8 +185,9 @@ export function Journey() {
 
   return (
     <section ref={root} aria-label="Beneficios de la palta Hass" className="relative hidden bg-background md:block motion-reduce:md:hidden">
-      <div data-wrap className="relative h-[840vh]">
-        <div data-sticky style={{ "--k": 1, "--kf": 1, "--cw": "490px", "--m": "40px" } as React.CSSProperties} className="sticky top-0 h-screen overflow-hidden">
+      <div data-wrap className="relative h-[1235vh]">
+        <div data-sticky style={{ "--k": 1, "--kf": 1, "--cw": "490px", "--m": "40px" } as React.CSSProperties} className="sticky top-0 h-screen overflow-hidden bg-primary">
+          <div data-stage className="absolute inset-0 bg-background">
           {/* Líneas (detrás de todo) */}
           {lineas.map((l, i) => (
             <svg key={i} data-linea viewBox={l.vb} preserveAspectRatio="none" aria-hidden="true" style={{ top: l.top, height: l.h, overflow: "visible" }} className="pointer-events-none absolute left-0 z-0 w-full">
@@ -200,13 +229,20 @@ export function Journey() {
           ))}
 
           {/* Palta protagonista: centrada y fija durante toda la escena */}
-          <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
+          <div data-pwrap className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
             <div data-palta style={{ aspectRatio: `${giroPalta.width} / ${giroPalta.height}` }} className={`relative w-[calc(340px*var(--k))] select-none ${shadow}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/paltas/palta-1.webp" width={770} height={1093} alt="Palta Hass madura" className="absolute inset-0 size-full object-contain" />
               <canvas aria-hidden="true" className="absolute inset-0 size-full opacity-0" />
             </div>
           </div>
+
+          {/* Escena 7: el cajón (detrás y delante de la palta) */}
+          <CajonCrate zBack="z-[15]" zFront="z-[25]" />
+          </div>
+
+          {/* Escena 7: formulario (sube y queda fijo al centro) */}
+          <CotizarForm z="z-30" />
         </div>
       </div>
     </section>

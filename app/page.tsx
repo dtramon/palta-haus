@@ -5,7 +5,6 @@ import { Recipes } from "@/components/Recipes";
 import { Benefits } from "@/components/Benefits";
 import { Journey } from "@/components/Journey";
 import { ThreePaltas } from "@/components/ThreePaltas";
-import { Cajon } from "@/components/Cajon";
 import { Footer } from "@/components/Footer";
 
 export default function Home() {
@@ -21,7 +20,6 @@ export default function Home() {
           <Benefits />
         </div>
         <ThreePaltas />
-        <Cajon />
       </main>
       <Footer />
     </>

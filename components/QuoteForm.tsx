@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Input } from "./ui/input";
@@ -12,6 +12,7 @@ type Errors = Partial<Record<string, string[]>>;
 export function QuoteForm() {
   const [state, setState] = useState<"idle" | "sending" | "ok" | "error">("idle");
   const [errors, setErrors] = useState<Errors>({});
+  const uid = useId(); // la tarjeta puede estar montada en más de una escena (escritorio / móvil): los ids no deben repetirse
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -65,9 +66,9 @@ export function QuoteForm() {
             { id: "cantidad", label: "Cantidad aproximada", type: "text", placeholder: "Ej.: 5 cajas por semana, o 3 kilos" },
           ].map((f) => (
             <div key={f.id} className="flex flex-col gap-2">
-              <Label htmlFor={f.id}>{f.label}</Label>
-              <Input id={f.id} name={f.id} type={f.type} autoComplete={f.autoComplete} placeholder={f.placeholder} aria-invalid={!!err(f.id)} aria-describedby={err(f.id) ? `${f.id}-err` : undefined} />
-              {err(f.id) && <span id={`${f.id}-err`} role="alert" className="text-base text-[#9b2c1f]">{err(f.id)}</span>}
+              <Label htmlFor={`${uid}${f.id}`}>{f.label}</Label>
+              <Input id={`${uid}${f.id}`} name={f.id} type={f.type} autoComplete={f.autoComplete} placeholder={f.placeholder} aria-invalid={!!err(f.id)} aria-describedby={err(f.id) ? `${uid}${f.id}-err` : undefined} />
+              {err(f.id) && <span id={`${uid}${f.id}-err`} role="alert" className="text-base text-[#9b2c1f]">{err(f.id)}</span>}
             </div>
           ))}
 
