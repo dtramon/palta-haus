@@ -8,15 +8,16 @@ import { Card } from "./ui/card";
 import { beneficios } from "@/lib/content";
 import { giroPalta } from "@/lib/sequences";
 
-export type Item = { title: string; dato: string; texto: string };
+export type Item = { title: string; icono: string; dato: string; texto: string };
 
-export function BenefitCard({ title, dato, texto }: Item) {
+export function BenefitCard({ title, icono, dato, texto }: Item) {
   return (
-    <Card data-benefit className="stage-card flex flex-col gap-2 rounded-[calc(var(--radius)+8px)] p-6 md:gap-[calc(10px*var(--kf,1))] md:p-[calc(28px*var(--kf,1))]">
-      <span aria-hidden="true" className="inline-flex size-[52px] items-center justify-center rounded-full border-2 border-dashed border-primary text-[10px] font-bold md:size-[calc(52px*var(--kf,1))]">ÍCONO</span>
-      <h3 className="display m-0 text-[46px] leading-[.88] uppercase md:text-[calc(46px*var(--kf,1))]">{title}</h3>
+    <Card data-benefit className="stage-card flex flex-col items-center gap-2 rounded-[calc(var(--radius)+8px)] border-0 bg-[#b6cba5] p-6 text-center text-foreground md:gap-[calc(10px*var(--kf,1))] md:p-[calc(28px*var(--kf,1))]">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={icono} alt="" aria-hidden="true" width={128} height={128} loading="lazy" className="size-16 md:size-[calc(72px*var(--kf,1))]" />
+      <h3 className="display m-0 text-[46px] leading-[.88] text-white uppercase md:text-[calc(46px*var(--kf,1))]">{title}</h3>
       <p className="m-0 text-[22px] font-bold md:text-[calc(22px*var(--kf,1))]">{dato}</p>
-      <p className="m-0 text-[19px] leading-[1.3] text-muted-foreground md:text-[calc(19px*var(--kf,1))]">{texto}</p>
+      <p className="m-0 text-[19px] leading-[1.3] md:text-[calc(19px*var(--kf,1))]">{texto}</p>
     </Card>
   );
 }

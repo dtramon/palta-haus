@@ -59,13 +59,13 @@ export const etiquetas = ["Completo italiano", "Palta reina", "Marraqueta con pa
 
 export const beneficios = {
   izquierda: [
-    { title: "Más fibra", dato: "5,4 g por media palta", texto: "Te deja satisfecho por más tiempo y ayuda a tu digestión." },
-    { title: "Más folato", dato: "32 % del valor diario por media palta", texto: "Tu cuerpo lo usa para renovar sus células, como los glóbulos rojos." },
-    { title: "Cremosa y liviana", dato: "0 mg de colesterol, sodio 1 % VD", texto: "Cero colesterol y muy poca sal." },
+    { title: "Más fibra", icono: "/beneficios/fibra.png", dato: "5,4 g por media palta", texto: "Te deja satisfecho por más tiempo y ayuda a tu digestión." },
+    { title: "Más folato", icono: "/beneficios/folato.png", dato: "32 % del valor diario por media palta", texto: "Tu cuerpo lo usa para renovar sus células, como los glóbulos rojos." },
+    { title: "Cremosa y liviana", icono: "/beneficios/cremosa.png", dato: "0 mg de colesterol, sodio 1 % VD", texto: "Cero colesterol y muy poca sal." },
   ],
   derecha: [
-    { title: "Más potasio", dato: "388 mg por media palta", texto: "Ayuda a que tus nervios, tus músculos y tu corazón funcionen bien." },
-    { title: "Grasas buenas", dato: "7,8 g de grasa monoinsaturada", texto: "Energía que te deja satisfecho, de grasa de origen vegetal." },
+    { title: "Más potasio", icono: "/beneficios/potasio.png", dato: "388 mg por media palta", texto: "Ayuda a que tus nervios, tus músculos y tu corazón funcionen bien." },
+    { title: "Grasas buenas", icono: "/beneficios/grasas.png", dato: "7,8 g de grasa monoinsaturada", texto: "Energía que te deja satisfecho, de grasa de origen vegetal." },
   ],
   fuente: "Fuente: 5 al día Chile · porción de 80 g (media palta)",
 };
