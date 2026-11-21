@@ -63,6 +63,10 @@ export function Journey() {
         const k = gsap.utils.clamp(0.62, 2.2, Math.min(W / 1440, window.innerHeight / 900));
         // Cards: nunca más anchas que el espacio libre entre el borde y la palta (sin solapar).
         const cw = Math.min(520 * k, W / 2 - 230 * k);
+        // Se acercan a la palta hasta 150 px (de diseño) respecto del borde, sin pasar de 20·k de distancia a la palta.
+        const libre = W / 2 - 170 * k - 40 * k - cw;
+        const m = 40 * k + Math.max(0, Math.min(150 * k, libre - 20 * k));
+        sticky.style.setProperty("--m", `${m}px`);
         sticky.style.setProperty("--k", String(k));
         sticky.style.setProperty("--kf", String(Math.max(k, 0.8)));
         sticky.style.setProperty("--cw", `${cw}px`);
@@ -154,7 +158,7 @@ export function Journey() {
   return (
     <section ref={root} aria-label="Beneficios de la palta Hass" className="relative hidden bg-background md:block motion-reduce:md:hidden">
       <div data-wrap className="relative h-[840vh]">
-        <div data-sticky style={{ "--k": 1, "--kf": 1, "--cw": "490px" } as React.CSSProperties} className="sticky top-0 h-screen overflow-hidden">
+        <div data-sticky style={{ "--k": 1, "--kf": 1, "--cw": "490px", "--m": "40px" } as React.CSSProperties} className="sticky top-0 h-screen overflow-hidden">
           {/* Líneas (detrás de todo) */}
           {lineas.map((l, i) => (
             <svg key={i} data-linea viewBox={l.vb} preserveAspectRatio="none" aria-hidden="true" style={{ top: l.top, height: l.h, overflow: "visible" }} className="pointer-events-none absolute left-0 z-0 w-full">
@@ -189,7 +193,7 @@ export function Journey() {
           {/* Cards: cada una en su fila centrada; alternan lados. Ancho = espacio libre hasta la palta (--cw), escalado por --k desde el diseño de 1440×900. */}
           {orden.map((b, i) => (
             <div key={b.title} className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-              <div className={`flex w-[calc(100vw-80px*var(--k))] ${i % 2 ? "justify-start" : "justify-end"}`}>
+              <div className={`flex w-[calc(100vw-2*var(--m))] ${i % 2 ? "justify-start" : "justify-end"}`}>
                 <div className="w-[var(--cw)]"><BenefitCard {...b} /></div>
               </div>
             </div>
